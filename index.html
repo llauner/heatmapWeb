@@ -9,14 +9,53 @@
     <style>
         body { margin: 0; padding: 0; }
         #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+
+        .map-overlay {
+            font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+            position: absolute;
+            width: 25%;
+            top: 0;
+            left: 0;
+            padding: 10px;
+        }
+ 
+        .map-overlay .map-overlay-inner {
+            background-color: #fff;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+            border-radius: 3px;
+            padding: 10px;
+            margin-bottom: 5px;
+        }
+ 
+        .map-overlay h2 {
+            line-height: 24px;
+            display: block;
+            margin: 0 0 10px;
+        }
+
+        .map-overlay input {
+                background-color: transparent;
+                display: inline-block;
+                width: 100%;
+                position: relative;
+                margin: 0;
+                cursor: ew-resize;
+            }
     </style>
 </head>
 <body>
 <div id="map"></div>
+
+<div class="map-overlay top">
+    <div class="map-overlay-inner">
+        <h2>Vario (m/s)</h2>
+        <label id="vario-label"></label>
+        <input id="slider" type="range" min="1" max="5" step="0.1" value="1.0" />
+    </div>
+</div>
+
 <script>
     mapboxgl.accessToken = 'pk.eyJ1IjoibHVkb3ZpY2xhdW5lciIsImEiOiJjazVtNzdvYzkwdTMzM2txa2xvaXJ0ZnY3In0.G6nft9RJo94MHqOOmIaYwA';
-
- 
 
 
     var map = new mapboxgl.Map({
@@ -24,16 +63,10 @@
         style:"styles/style.json"
     });
 
-    
-
-
-
-  
-
-
     map.on('load',
         function () {
 
+            // --- Add data source ---
             map.addSource('latest-data', {
                 type: 'geojson',
                 data: 'geojson/2019_Ludovic.geojson'
@@ -41,10 +74,10 @@
 
 
 
-            // ### Layer: Heatmap
+            // --- Layer: Heatmap
             map.addLayer(
                 {
-                    "id": "2019-heatmap-Ludovic",
+                    "id": "layer-heatmap",
                     "type": "heatmap",
                     "metadata": { "mapbox:group": "e686e2df54587f748da0baac43613eb5" },
                     "source": "latest-data",
@@ -122,10 +155,10 @@
             );
             // End : Heatmap layer
 
-            // ### Layer: Vario values
+            // --- Layer: Vario values
             map.addLayer(
                 {
-                    "id": "2019-Symbol-Ludovic",
+                    "id": "layer-vario-value",
                     "type": "symbol",
                     "metadata": {"mapbox:group": "e686e2df54587f748da0baac43613eb5"},
                     "source": "latest-data",
@@ -149,10 +182,24 @@
             // End: Vario values
 
 
+            filterBy(1);
+ 
+            document
+                .getElementById('slider')
+                .addEventListener('input', function(e) {
+                    var vario = parseFloat(e.target.value,2);
+                    filterBy(vario);
+                });
         });
 
+    function filterBy(vario) {
+        var filters = ['>=', 'vario', vario];
+        map.setFilter('layer-heatmap', filters);
+        map.setFilter('layer-vario-value', filters);
 
-    
+        // Set the label to the month
+        document.getElementById('vario-label').textContent = vario;
+    }
 
 
 </script>
