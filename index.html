@@ -63,11 +63,21 @@
         <label id="vario-label"></label>
         <input id="slider" type="range" min="1" max="5" step="0.1" value="1.0" />
     </div>
+
+    <div class="map-overlay-inner">
+        <h2>Altitude</h2>
+        <label id="label-altitude-in"></label>
+        <input id="slider-altitude-in" type="range" min="0" max="5000" step="100" value="1000" />
+    </div>
 </div>
 
+
 <script>
+
     mapboxgl.accessToken = 'pk.eyJ1IjoibHVkb3ZpY2xhdW5lciIsImEiOiJjazVtNzdvYzkwdTMzM2txa2xvaXJ0ZnY3In0.G6nft9RJo94MHqOOmIaYwA';
 
+    var varioFilterValue = 1;
+    var altInFilterValue = 1000;
 
     var map = new mapboxgl.Map({
         container: 'map',           // container id
@@ -80,7 +90,7 @@
             // --- Add data source ---
             map.addSource('latest-data', {
                 type: 'geojson',
-                data: 'geojson/2019_Ludovic.geojson'
+                data: 'geojson/2019_Ludovic_alt_in.geojson'
             });
 
 
@@ -140,24 +150,14 @@
                         ],
                         "heatmap-weight": [
                             "case",
-                            [">", ["get", "vario"], 1],
                             [
-                                "interpolate",
-                                ["linear"],
-                                ["get", "vario"],
-                                0,
-                                0,
-                                1,
-                                1,
-                                1.5,
-                                2,
-                                2.5,
-                                3,
-                                3,
-                                4,
-                                3.2,
-                                5
+                                "<",
+                                ["get", "alt_in"],
+                                2000
                             ],
+                            0,
+                            [">", ["get", "vario"], 1],
+                            1,
                             0
                         ]
                     }
@@ -193,22 +193,33 @@
             // End: Vario values
 
 
-            filterBy(1);
+            filterBy(varioFilterValue, altInFilterValue);
 
-            $('#slider').on('input',
-                function(e) {
-                    var vario = parseFloat(e.target.value, 2);
-                    filterBy(vario);
+
+            $('#slider, #slider-altitude-in').on('input',
+                function (e) {
+                    var $varioSlider = $('#slider')[0];
+                    var $altitudeSlider = $('#slider-altitude-in')[0];
+
+                    varioFilterValue = parseFloat($varioSlider.value, 2);
+                    altInFilterValue = parseInt($altitudeSlider.value);
+                    filterBy(varioFilterValue, altInFilterValue );
                 });
         });
 
-    function filterBy(vario) {
-        var filters = ['>=', 'vario', vario];
+    function filterBy(vario, altitude) {
+        // Add updated filters
+        var filters = ['all',
+                        ['>=', 'vario', vario],
+                        ['>=', 'alt_in', altitude]
+        ];
+
         map.setFilter('layer-heatmap', filters);
         map.setFilter('layer-vario-value', filters);
 
-        // Set the label to the month
+        // Set the labels
         $('#vario-label').html(vario);
+        $('#label-altitude-in').html(altitude);
     }
 
 
