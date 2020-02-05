@@ -73,11 +73,27 @@
 
 
 <script>
-
     mapboxgl.accessToken = 'pk.eyJ1IjoibHVkb3ZpY2xhdW5lciIsImEiOiJjazVtNzdvYzkwdTMzM2txa2xvaXJ0ZnY3In0.G6nft9RJo94MHqOOmIaYwA';
 
+    const storageBaseUrl = "geojson/";
     var varioFilterValue = 1;
     var altInFilterValue = 1000;
+
+    // Parse querystring parameters to extract desired day
+    // Expected date format = yyyy_mm_dd example: 2020_02_05
+    var queryString = window.location.search;
+    targetDayParam = null;
+    if (queryString) {
+        var urlParams = new URLSearchParams(queryString);
+        targetDayParam = urlParams.get('day');
+    }
+
+    // Build geojson target filename
+    var geojsonTargetDataSourceUrl = storageBaseUrl + "2019_Ludovic_alt_in.geojson";
+    if (targetDayParam) {
+        geojsonTargetDataSourceUrl = storageBaseUrl + targetDayParam + ".geojson";
+    }
+
 
     var map = new mapboxgl.Map({
         container: 'map',           // container id
@@ -90,7 +106,7 @@
             // --- Add data source ---
             map.addSource('latest-data', {
                 type: 'geojson',
-                data: 'geojson/2019_Ludovic_alt_in.geojson'
+                data: geojsonTargetDataSourceUrl
             });
 
 
