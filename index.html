@@ -3,6 +3,9 @@
 <head>
     <meta charset="utf-8" />
     <title>Display a map with a custom style</title>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
     <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
     <script src="https://api.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.js"></script>
     <link href="https://api.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.css" rel="stylesheet" />
@@ -59,15 +62,18 @@
 
 <div class="map-overlay top">
     <div class="map-overlay-inner">
+        <h4>Vario (m/s)</h4>
+    </div>
+    <div class="map-overlay-inner">
         <h2>Vario (m/s)</h2>
         <label id="vario-label"></label>
-        <input id="slider" type="range" min="0" max="5" step="0.1" value="1.0" />
+        <input id="slider" type="range" min="0" max="5" step="0.1" value="1.0"/>
     </div>
 
     <div class="map-overlay-inner">
         <h2>Vario start Altitude (m)</h2>
         <label id="label-altitude-in"></label>
-        <input id="slider-altitude-in" type="range" min="0" max="5000" step="100" value="1000" />
+        <input id="slider-altitude-in" type="range" min="0" max="5000" step="100" value="1000"/>
     </div>
 </div>
 
@@ -76,8 +82,9 @@
     mapboxgl.accessToken = 'pk.eyJ1IjoibHVkb3ZpY2xhdW5lciIsImEiOiJjazVtNzdvYzkwdTMzM2txa2xvaXJ0ZnY3In0.G6nft9RJo94MHqOOmIaYwA';
 
     const storageBaseUrl = "geojson/";
+    const heatMapFileNamePrefix = "-heatmap.geojson";
     var varioFilterValue = 1;
-    var altInFilterValue = 1000;
+    var altInFilterValue = 0;
 
     // Parse querystring parameters to extract desired day
     // Expected date format = yyyy_mm_dd example: 2020_02_05
@@ -89,9 +96,9 @@
     }
 
     // Build geojson target filename
-    var geojsonTargetDataSourceUrl = storageBaseUrl + "2019_Ludovic_alt_in.geojson";
+    var geojsonTargetDataSourceUrl = storageBaseUrl + "latest" + heatMapFileNamePrefix;
     if (targetDayParam) {
-        geojsonTargetDataSourceUrl = storageBaseUrl + targetDayParam + ".geojson";
+        geojsonTargetDataSourceUrl = storageBaseUrl + targetDayParam + heatMapFileNamePrefix;
     }
 
 
