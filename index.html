@@ -10,6 +10,10 @@
     <script src="https://api.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.js"></script>
     <link href="https://api.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.css" rel="stylesheet" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src=" https://cdnjs.cloudflare.com/ajax/libs/jquery-dateFormat/1.0/jquery.dateFormat.min.js"></script>
+
+    <link rel="stylesheet" href="css/heatmap.css">
+
     <style>
         body {
             margin: 0;
@@ -62,10 +66,28 @@
 
 <div class="map-overlay top">
     <div class="map-overlay-inner">
-        <div id="legend" class="legend">
-            <div id="current-date">Magnitude (m)</div>
+        <div class="container">
+            <div class="item">Jour de vol:</div>
+            <div id="target-date" class="item thick"></div>
+        </div>
+        <div class="container">
+            <div class="item">Analyse du:</div>
+            <div id="start-date" class="item">ff</div>
+        </div>
+        <div class="container">
+            <div class="item">Durée calcul:</div>
+            <div id="duration" class="item"></div>
+        </div>
+        <div class="container">
+            <div class="item">Nb Vols:</div>
+            <div id="flights-count" class="item"></div>
+        </div>
+        <div class="container">
+            <div class="item">Nb Thermiques:</div>
+            <div id="thermals-count" class="item"></div>
         </div>
     </div>
+
     <div class="map-overlay-inner">
         <h2>Vario (m/s)</h2>
         <label id="vario-label"></label>
@@ -73,7 +95,7 @@
     </div>
 
     <div class="map-overlay-inner">
-        <h2>Vario start Altitude (m)</h2>
+        <h2>Altitude départ Vario (m)</h2>
         <label id="label-altitude-in"></label>
         <input id="slider-altitude-in" type="range" min="0" max="5000" step="100" value="0"/>
     </div>
@@ -117,7 +139,6 @@
                 type: 'geojson',
                 data: geojsonTargetDataSourceUrl
             });
-
 
 
             // --- Layer: Heatmap
@@ -246,6 +267,37 @@
         $('#vario-label').html(vario);
         $('#label-altitude-in').html(altitude);
     }
+
+    // ---------- Document loaded ----------
+    $(function() {
+        $.ajax({
+            url: "geojson/latest-metadata.json",
+            type: 'GET',
+            context: document.body,
+            success: function (result) {
+                // Get result metadata
+                metadata = result;
+                targetDate = $.format.date(metadata.targetDate, "dd/MM/yyyy");
+                startDate = $.format.date(metadata.startDate, "dd/MM/yyyy hh:mm:ss");
+                duration = metadata.duration;
+                flightsCount = metadata.flightsCount;
+                thermalsCount = metadata.thermalsCount;
+
+                // Populate information panel
+                $('#target-date').html(targetDate);
+                $('#start-date').html(startDate);
+                $('#duration').html(duration);
+                $('#flights-count').html(flightsCount);
+                $('#thermals-count').html(thermalsCount);
+            },
+
+            error: function(result, status, errorThrown) {
+                console.log(errorThrown);
+            }
+
+
+        });
+    });
 
 
 </script>
