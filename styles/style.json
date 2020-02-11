@@ -1,6 +1,6 @@
 {
   "version": 8,
-  "name": "Ludovic - Heatmap-copy",
+  "name": "2000-2019 - Ludovic - Heatmap",
   "metadata": {
     "mapbox:type": "default",
     "mapbox:origin": "outdoors-v11",
@@ -144,7 +144,7 @@
     "mapbox:trackposition": false,
     "mapbox:uiParadigm": "layers",
     "mapbox:decompiler": {
-      "id": "ck5qrxqhr24h21ismobyq0tnj",
+      "id": "ck5s9i7ld11ma1imfsf7uhrfv",
       "componentVersion": "0.4.1",
       "propConfig": {
         "road-network": {
@@ -283,7 +283,6 @@
             [ "point-of-interest-labels", "poi-labels" ],
             [ "transit", "transit-labels" ],
             [ "place-labels", "place-labels" ],
-            "2019-circle-Ludovic",
             "2019-heatmap-Ludovic",
             "2019-Symbol-Ludovic"
           ]
@@ -758,17 +757,17 @@
       }
     }
   },
-  "center": [ 2.5129423023131494, 46.828068146024265 ],
-  "zoom": 5.977915729435414,
+  "center": [ 3.059808431940837, 46.96158604444395 ],
+  "zoom": 5.920653123450329,
   "bearing": 0,
   "pitch": 0,
   "sources": {
     "composite": {
-      "url": "mapbox://mapbox.mapbox-streets-v8,ludoviclauner.ck5qrz5dw000k2npa6kyptedr-8kc30,mapbox.mapbox-terrain-v2",
+      "url": "mapbox://mapbox.mapbox-streets-v8,ludoviclauner.ck5s9jer80kx12nn5d5wzoaot-0j191,mapbox.mapbox-terrain-v2",
       "type": "vector"
     }
   },
-  "sprite": "mapbox://sprites/ludoviclauner/ck5sbp0ac0tvo1inyxg5vwdiy/1rdllvf6rchnzqn7ctj5xpt0w",
+  "sprite": "mapbox://sprites/ludoviclauner/ck5s9i7ld11ma1imfsf7uhrfv/1rdllvf6rchnzqn7ctj5xpt0w",
   "glyphs": "mapbox://fonts/ludoviclauner/{fontstack}/{range}.pbf",
   "layers": [
     {
@@ -7790,12 +7789,10 @@
         "text-halo-width": 1.25
       }
     }
-
-
   ],
-  "created": "2020-01-24T15:31:29.096Z",
-  "id": "ck5sbp0ac0tvo1inyxg5vwdiy",
-  "modified": "2020-01-24T15:31:29.096Z",
+  "created": "2020-01-24T14:30:12.742Z",
+  "id": "ck5s9i7ld11ma1imfsf7uhrfv",
+  "modified": "2020-02-11T07:54:40.538Z",
   "owner": "ludoviclauner",
   "visibility": "private",
   "draft": false
