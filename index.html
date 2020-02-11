@@ -62,7 +62,9 @@
 
 <div class="map-overlay top">
     <div class="map-overlay-inner">
-        <h4>Vario (m/s)</h4>
+        <div id="legend" class="legend">
+            <div id="current-date">Magnitude (m)</div>
+        </div>
     </div>
     <div class="map-overlay-inner">
         <h2>Vario (m/s)</h2>
@@ -73,7 +75,7 @@
     <div class="map-overlay-inner">
         <h2>Vario start Altitude (m)</h2>
         <label id="label-altitude-in"></label>
-        <input id="slider-altitude-in" type="range" min="0" max="5000" step="100" value="1000"/>
+        <input id="slider-altitude-in" type="range" min="0" max="5000" step="100" value="0"/>
     </div>
 </div>
 
