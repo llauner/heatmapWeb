@@ -107,6 +107,7 @@
 
     const storageBaseUrl = "geojson/";
     const heatMapFileNamePrefix = "-heatmap.geojson";
+    const metaDataFileNamePrefix = "-metadata.json";
     var varioFilterValue = 1;
     var altInFilterValue = 0;
 
@@ -119,10 +120,12 @@
         targetDayParam = urlParams.get('day');
     }
 
-    // Build geojson target filename
+    // Build geojson and metadata  filename
     var geojsonTargetDataSourceUrl = storageBaseUrl + "latest" + heatMapFileNamePrefix;
+    var metadataJsonSourceUrl = storageBaseUrl + "latest" + metaDataFileNamePrefix;
     if (targetDayParam) {
         geojsonTargetDataSourceUrl = storageBaseUrl + targetDayParam + heatMapFileNamePrefix;
+        metadataJsonSourceUrl = storageBaseUrl + targetDayParam + metaDataFileNamePrefix;
     }
 
 
@@ -271,14 +274,14 @@
     // ---------- Document loaded ----------
     $(function() {
         $.ajax({
-            url: "geojson/latest-metadata.json",
+            url: metadataJsonSourceUrl,
             type: 'GET',
             context: document.body,
             success: function (result) {
                 // Get result metadata
                 metadata = result;
                 targetDate = $.format.date(metadata.targetDate, "dd/MM/yyyy");
-                startDate = $.format.date(metadata.startDate, "dd/MM/yyyy hh:mm:ss");
+                startDate = $.format.date(metadata.startDate, "dd/MM/yyyy HH:mm:ss");
                 duration = metadata.duration;
                 flightsCount = metadata.flightsCount;
                 thermalsCount = metadata.thermalsCount;
