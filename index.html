@@ -98,14 +98,20 @@
         // Expected date format = yyyy_mm_dd example: 2020_02_05
         var queryString = window.location.search;
         targetDayParam = null;
+        volIdParam = null;
+
         if (queryString) {
             var urlParams = new URLSearchParams(queryString);
             targetDayParam = urlParams.get('day');
+            volIdParam = urlParams.get('volId');
         }
 
         // Build geojson and metadata  filename
         var geojsonTargetDataSourceUrl = storageBaseUrl + "latest" + heatMapFileNamePrefix;
         var metadataJsonSourceUrl = storageBaseUrl + "latest" + metaDataFileNamePrefix;
+
+        // --- Apply queystring parameters ---
+        // Target day
         if (targetDayParam) {
             geojsonTargetDataSourceUrl = storageBaseUrl + targetDayParam + heatMapFileNamePrefix;
             metadataJsonSourceUrl = storageBaseUrl + targetDayParam + metaDataFileNamePrefix;
@@ -290,6 +296,15 @@
                     console.log("Loading Netcoupe flight#" + flightId);
                     loadNetcoupeFlight(flightId);
                 });
+
+            // ----- Apply Querystring parameters -----
+            // Netcoupe volId
+            if (volIdParam && parseInt(volIdParam)) {
+                volIdParam = parseInt(volIdParam);
+                loadNetcoupeFlight(volIdParam); // Load flight
+                $('#lbl-flight-id').val(volIdParam);
+
+            }
         });
 
         function loadNetcoupeFlight(flightId) {
