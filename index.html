@@ -15,6 +15,7 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
     <script src=" https://cdnjs.cloudflare.com/ajax/libs/jquery-dateFormat/1.0/jquery.dateFormat.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
     <script src="js/heatmap.js"></script>
 
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
@@ -93,6 +94,8 @@
         const metaDataFileNamePrefix = "-metadata.json";
         var varioFilterValue = 1;
         var altInFilterValue = 0;
+        var tracksCount = 0;            // Number of tracks being displayed on the page
+        var trackIds = [];              // List of Netcoupe volId currently 
 
         // Parse querystring parameters to extract desired day
         // Expected date format = yyyy_mm_dd example: 2020_02_05
@@ -308,7 +311,16 @@
         });
 
         function loadNetcoupeFlight(flightId) {
-            var requestUrl = "https://igcheatmap.appspot.com/netcoupe/" + flightId;
+            // Check that the flight is not alrady there
+            flightId = parseInt(flightId);
+            if (trackIds.includes(flightId)) {
+                toastr["error"]("Le vol est déja présent !", "Vol Netcoupe #" + flightId);
+                return;
+            } else {
+                trackIds.push(flightId);
+            }
+
+                var requestUrl = "https://igcheatmap.appspot.com/netcoupe/" + flightId;
             $.ajax({
                 url: requestUrl,
                 type: 'GET',
@@ -324,13 +336,21 @@
                         data: geojsontrack
                     });
 
+                    // Pick color for the new layer:
+                    tracksCount++;
+                    if (tracksCount == 10) {
+                        tracksCount = 0;
+                    }
+
+                    hslColor = hexToHSL(d3.schemeCategory10[tracksCount-1]);
+
                     map.addLayer(
                         {
                             "id": "flight-track-" + flightId,
                             "type": "line",
                             "source": "source-flight-track" + flightId,
                             "layout": {},
-                            "paint": {"line-color": "hsl(226, 78%, 49%)", "line-width": 3}
+                            "paint": {"line-color": hslColor, "line-width": 3}
                         }
                     );
 
@@ -340,7 +360,7 @@
                     toastr["success"]("Vol Netcoupe #" + flightId, "Vol chargé");
                 },
                 error: function(result) {
-                    console.log(errorThrown);
+                    console.log(result);
                     if (result.status == 404) {
                         toastr["error"]("Le vol n'éxiste pas !","Vol Netcoupe #" + flightId);
                     } else {
