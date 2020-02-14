@@ -94,7 +94,6 @@
         const metaDataFileNamePrefix = "-metadata.json";
         var varioFilterValue = 1;
         var altInFilterValue = 0;
-        var tracksCount = 0;            // Number of tracks being displayed on the page
         var trackIds = [];              // List of Netcoupe volId currently 
 
         // Parse querystring parameters to extract desired day
@@ -337,7 +336,7 @@
                     });
 
                     // Pick color for the new layer:
-                    tracksCount++;
+                    var tracksCount = trackIds.length + 1;
                     if (tracksCount == 10) {
                         tracksCount = 0;
                     }
