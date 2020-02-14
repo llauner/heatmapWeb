@@ -68,7 +68,10 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="css\heatmap.css" />
+    <Content Include="css\mapbox.css" />
+    <Content Include="favicon.ico" />
     <Content Include="index.html" />
+    <Content Include="js\heatmap.js" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>

@@ -1,8 +1,8 @@
 ﻿<!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="utf-8" />
-    <title>Display a map with a custom style</title>
+    <title>Thermals Heatmap</title>
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
@@ -10,300 +10,334 @@
     <script src="https://api.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.js"></script>
     <link href="https://api.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.css" rel="stylesheet" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
     <script src=" https://cdnjs.cloudflare.com/ajax/libs/jquery-dateFormat/1.0/jquery.dateFormat.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+    <script src="js/heatmap.js"></script>
 
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.css">
+    <link rel="stylesheet" href="css/mapbox.css">
     <link rel="stylesheet" href="css/heatmap.css">
-
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-        }
-
-        #map {
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            width: 100%;
-        }
-
-        .map-overlay {
-            font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
-            position: absolute;
-            width: 25%;
-            top: 0;
-            left: 0;
-            padding: 10px;
-        }
-
-            .map-overlay .map-overlay-inner {
-                background-color: #FFFFFF;
-                opacity: 1;
-                box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-                border-radius: 3px;
-                padding: 10px;
-                margin-bottom: 5px;
-            }
-
-            .map-overlay h2 {
-                line-height: 24px;
-                display: block;
-                margin: 0 0 10px;
-            }
-
-            .map-overlay input {
-                background-color: transparent;
-                display: inline-block;
-                width: 100%;
-                position: relative;
-                margin: 0;
-                cursor: ew-resize;
-            }
-    </style>
 </head>
 <body>
-<div id="map"></div>
+    <div id="map"></div>
+    <!---------- Information overlay ---------->
+    <div class="map-overlay top">
+        <div class="map-overlay-inner">
+            <div class="container">
+                <div class="item">Jour de vol:</div>
+                <div id="target-date" class="item thick"></div>
+            </div>
+            <div class="container">
+                <div class="item">Analyse du:</div>
+                <div id="start-date" class="item">ff</div>
+            </div>
+            <div class="container">
+                <div class="item">Durée calcul:</div>
+                <div id="duration" class="item"></div>
+            </div>
+            <div class="container">
+                <div class="item">Nb Vols:</div>
+                <div id="flights-count" class="item"></div>
+            </div>
+            <div class="container">
+                <div class="item">Nb Thermiques:</div>
+                <div id="thermals-count" class="item"></div>
+            </div>
+        </div>
 
-<div class="map-overlay top">
-    <div class="map-overlay-inner">
-        <div class="container">
-            <div class="item">Jour de vol:</div>
-            <div id="target-date" class="item thick"></div>
+        <!---------- Flight selection ---------->
+        <div class="map-overlay-inner container">
+            <h6 class="font-weight-bold">Trace de vol Netcoupe</h6>
+            
+            <div class="row">
+                <div class="col-sm-8">
+                    <div class="input-group input-group-sm mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="basic-addon1">ID</span>
+                        </div>
+                        <input type="number" class="form-control" placeholder="#" aria-label="Username" aria-describedby="basic-addon1" id="lbl-flight-id"/>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <button type="button" class="btn btn-outline-dark btn-sm" id="btn-get-flight">Go</button>
+                </div>
+
+            </div>
         </div>
-        <div class="container">
-            <div class="item">Analyse du:</div>
-            <div id="start-date" class="item">ff</div>
+
+        <!---------- Vario selection ---------->
+        <div class="map-overlay-inner">
+            <h6 class="font-weight-bold">Vario (m/s)</h6>
+            <label id="vario-label"></label>
+            <input id="slider" type="range" min="0" max="5" step="0.1" value="1.0" />
         </div>
-        <div class="container">
-            <div class="item">Durée calcul:</div>
-            <div id="duration" class="item"></div>
-        </div>
-        <div class="container">
-            <div class="item">Nb Vols:</div>
-            <div id="flights-count" class="item"></div>
-        </div>
-        <div class="container">
-            <div class="item">Nb Thermiques:</div>
-            <div id="thermals-count" class="item"></div>
+
+        <!---------- Altitude selelection ----------->
+        <div class="map-overlay-inner">
+            <h6 class="font-weight-bold">Altitude départ Vario (m)</h6>
+            <label id="label-altitude-in"></label>
+            <input id="slider-altitude-in" type="range" min="0" max="5000" step="100" value="0" />
         </div>
     </div>
 
-    <div class="map-overlay-inner">
-        <h2>Vario (m/s)</h2>
-        <label id="vario-label"></label>
-        <input id="slider" type="range" min="0" max="5" step="0.1" value="1.0"/>
-    </div>
 
-    <div class="map-overlay-inner">
-        <h2>Altitude départ Vario (m)</h2>
-        <label id="label-altitude-in"></label>
-        <input id="slider-altitude-in" type="range" min="0" max="5000" step="100" value="0"/>
-    </div>
-</div>
+    <script>
+        mapboxgl.accessToken = 'pk.eyJ1IjoibHVkb3ZpY2xhdW5lciIsImEiOiJjazVtNzdvYzkwdTMzM2txa2xvaXJ0ZnY3In0.G6nft9RJo94MHqOOmIaYwA';
 
+        const storageBaseUrl = "geojson/";
+        const heatMapFileNamePrefix = "-heatmap.geojson";
+        const metaDataFileNamePrefix = "-metadata.json";
+        var varioFilterValue = 1;
+        var altInFilterValue = 0;
 
-<script>
-    mapboxgl.accessToken = 'pk.eyJ1IjoibHVkb3ZpY2xhdW5lciIsImEiOiJjazVtNzdvYzkwdTMzM2txa2xvaXJ0ZnY3In0.G6nft9RJo94MHqOOmIaYwA';
+        // Parse querystring parameters to extract desired day
+        // Expected date format = yyyy_mm_dd example: 2020_02_05
+        var queryString = window.location.search;
+        targetDayParam = null;
+        if (queryString) {
+            var urlParams = new URLSearchParams(queryString);
+            targetDayParam = urlParams.get('day');
+        }
 
-    const storageBaseUrl = "geojson/";
-    const heatMapFileNamePrefix = "-heatmap.geojson";
-    const metaDataFileNamePrefix = "-metadata.json";
-    var varioFilterValue = 1;
-    var altInFilterValue = 0;
-
-    // Parse querystring parameters to extract desired day
-    // Expected date format = yyyy_mm_dd example: 2020_02_05
-    var queryString = window.location.search;
-    targetDayParam = null;
-    if (queryString) {
-        var urlParams = new URLSearchParams(queryString);
-        targetDayParam = urlParams.get('day');
-    }
-
-    // Build geojson and metadata  filename
-    var geojsonTargetDataSourceUrl = storageBaseUrl + "latest" + heatMapFileNamePrefix;
-    var metadataJsonSourceUrl = storageBaseUrl + "latest" + metaDataFileNamePrefix;
-    if (targetDayParam) {
-        geojsonTargetDataSourceUrl = storageBaseUrl + targetDayParam + heatMapFileNamePrefix;
-        metadataJsonSourceUrl = storageBaseUrl + targetDayParam + metaDataFileNamePrefix;
-    }
+        // Build geojson and metadata  filename
+        var geojsonTargetDataSourceUrl = storageBaseUrl + "latest" + heatMapFileNamePrefix;
+        var metadataJsonSourceUrl = storageBaseUrl + "latest" + metaDataFileNamePrefix;
+        if (targetDayParam) {
+            geojsonTargetDataSourceUrl = storageBaseUrl + targetDayParam + heatMapFileNamePrefix;
+            metadataJsonSourceUrl = storageBaseUrl + targetDayParam + metaDataFileNamePrefix;
+        }
 
 
-    var map = new mapboxgl.Map({
-        container: 'map',           // container id
-        style:"styles/style.json"
-    });
+        var map = new mapboxgl.Map({
+            container: 'map',           // container id
+            style: "styles/style.json"
+        });
 
-    map.on('load',
-        function () {
+        map.on('load',
+            function () {
 
-            // --- Add data source ---
-            map.addSource('latest-data', {
-                type: 'geojson',
-                data: geojsonTargetDataSourceUrl
+                // --- Add data source ---
+                map.addSource('latest-data', {
+                    type: 'geojson',
+                    data: geojsonTargetDataSourceUrl
+                });
+
+
+                // --- Layer: Heatmap
+                map.addLayer(
+                    {
+                        "id": "layer-heatmap",
+                        "type": "heatmap",
+                        "metadata": { "mapbox:group": "e686e2df54587f748da0baac43613eb5" },
+                        "source": "latest-data",
+                        "layout": {
+                        },
+                        "paint": {
+                            "heatmap-intensity": [
+                                "interpolate",
+                                ["linear"],
+                                ["zoom"],
+                                0,
+                                5,
+                                5,
+                                1.3
+                            ],
+                            "heatmap-radius": [
+                                "interpolate",
+                                ["linear"],
+                                ["zoom"],
+                                1,
+                                1,
+                                5,
+                                4,
+                                7,
+                                5,
+                                9,
+                                6,
+                                12,
+                                11,
+                                15,
+                                25
+                            ],
+                            "heatmap-color": [
+                                "interpolate",
+                                ["linear"],
+                                ["heatmap-density"],
+                                0,
+                                "rgba(0, 0, 255, 0)",
+                                0.1,
+                                "royalblue",
+                                0.3,
+                                "cyan",
+                                0.5,
+                                "lime",
+                                0.7,
+                                "yellow",
+                                1,
+                                "red"
+                            ],
+                            "heatmap-weight": [
+                                "case",
+                                [
+                                    "<",
+                                    ["get", "alt_in"],
+                                    0
+                                ],
+                                0,
+                                [">", ["get", "vario"], 0],
+                                1,
+                                0
+                            ]
+                        }
+                    }
+
+                );
+                // End : Heatmap layer
+
+                // --- Layer: Vario values
+                map.addLayer(
+                    {
+                        "id": "layer-vario-value",
+                        "type": "symbol",
+                        "metadata": { "mapbox:group": "e686e2df54587f748da0baac43613eb5" },
+                        "source": "latest-data",
+                        "minzoom": 6,
+                        "filter": [">", ["get", "vario"], 1],
+                        "layout": {
+                            "text-justify": "auto",
+                            "text-size": 13,
+                            "text-offset": [0, 1],
+                            "text-field": [
+                                "step",
+                                ["zoom"],
+                                "",
+                                8,
+                                ["to-string", ["get", "vario"]]
+                            ]
+                        },
+                        "paint": {}
+                    }
+                );
+                // End: Vario values
+
+
+                filterBy(varioFilterValue, altInFilterValue);
+
+
+                $('#slider, #slider-altitude-in').on('input',
+                    function (e) {
+                        var $varioSlider = $('#slider')[0];
+                        var $altitudeSlider = $('#slider-altitude-in')[0];
+
+                        varioFilterValue = parseFloat($varioSlider.value, 2);
+                        altInFilterValue = parseInt($altitudeSlider.value);
+                        filterBy(varioFilterValue, altInFilterValue);
+                    });
             });
 
+        function filterBy(vario, altitude) {
+            // Add updated filters
+            var filters = ['all',
+                ['>=', 'vario', vario],
+                ['>=', 'alt_in', altitude]
+            ];
 
-            // --- Layer: Heatmap
-            map.addLayer(
-                {
-                    "id": "layer-heatmap",
-                    "type": "heatmap",
-                    "metadata": { "mapbox:group": "e686e2df54587f748da0baac43613eb5" },
-                    "source": "latest-data",
-                    "layout": {
-                    },
-                    "paint": {
-                        "heatmap-intensity": [
-                            "interpolate",
-                            ["linear"],
-                            ["zoom"],
-                            0,
-                            5,
-                            5,
-                            1.3
-                        ],
-                        "heatmap-radius": [
-                            "interpolate",
-                            ["linear"],
-                            ["zoom"],
-                            1,
-                            1,
-                            5,
-                            4,
-                            7,
-                            5,
-                            9,
-                            6,
-                            12,
-                            11,
-                            15,
-                            25
-                        ],
-                        "heatmap-color": [
-                            "interpolate",
-                            ["linear"],
-                            ["heatmap-density"],
-                            0,
-                            "rgba(0, 0, 255, 0)",
-                            0.1,
-                            "royalblue",
-                            0.3,
-                            "cyan",
-                            0.5,
-                            "lime",
-                            0.7,
-                            "yellow",
-                            1,
-                            "red"
-                        ],
-                        "heatmap-weight": [
-                            "case",
-                            [
-                                "<",
-                                ["get", "alt_in"],
-                                0
-                            ],
-                            0,
-                            [">", ["get", "vario"], 0],
-                            1,
-                            0
-                        ]
-                    }
+            map.setFilter('layer-heatmap', filters);
+            map.setFilter('layer-vario-value', filters);
+
+            // Set the labels
+            $('#vario-label').html(vario);
+            $('#label-altitude-in').html(altitude);
+        }
+
+        // ---------- Document loaded ----------
+        $(function () {
+            // ----- Load heatmap -----
+            $.ajax({
+                url: metadataJsonSourceUrl,
+                type: 'GET',
+                context: document.body,
+                success: function (result) {
+                    // Get result metadata
+                    metadata = result;
+                    targetDate = $.format.date(metadata.targetDate, "dd/MM/yyyy");
+                    startDate = $.format.date(metadata.startDate, "dd/MM/yyyy HH:mm:ss");
+                    duration = metadata.duration;
+                    flightsCount = metadata.flightsCount;
+                    thermalsCount = metadata.thermalsCount;
+
+                    // Populate information panel
+                    $('#target-date').html(targetDate);
+                    $('#start-date').html(startDate);
+                    $('#duration').html(duration);
+                    $('#flights-count').html(flightsCount);
+                    $('#thermals-count').html(thermalsCount);
+                },
+
+                error: function (result, status, errorThrown) {
+                    console.log(errorThrown);
                 }
+            });
 
-            );
-            // End : Heatmap layer
-
-            // --- Layer: Vario values
-            map.addLayer(
-                {
-                    "id": "layer-vario-value",
-                    "type": "symbol",
-                    "metadata": {"mapbox:group": "e686e2df54587f748da0baac43613eb5"},
-                    "source": "latest-data",
-                    "minzoom": 6,
-                    "filter": [">", ["get", "vario"], 1],
-                    "layout": {
-                        "text-justify": "auto",
-                        "text-size": 13,
-                        "text-offset": [0, 1],
-                        "text-field": [
-                            "step",
-                            ["zoom"],
-                            "",
-                            8,
-                            ["to-string", ["get", "vario"]]
-                        ]
-                    },
-                    "paint": {}
-                }
-            );
-            // End: Vario values
-
-
-            filterBy(varioFilterValue, altInFilterValue);
-
-
-            $('#slider, #slider-altitude-in').on('input',
-                function (e) {
-                    var $varioSlider = $('#slider')[0];
-                    var $altitudeSlider = $('#slider-altitude-in')[0];
-
-                    varioFilterValue = parseFloat($varioSlider.value, 2);
-                    altInFilterValue = parseInt($altitudeSlider.value);
-                    filterBy(varioFilterValue, altInFilterValue );
+            // ----- Event handler for flight -----
+            $('#btn-get-flight').on('click',
+                function () {
+                    flightId = $('#lbl-flight-id').val();
+                    console.log("Loading Netcoupe flight#" + flightId);
+                    loadNetcoupeFlight(flightId);
                 });
         });
 
-    function filterBy(vario, altitude) {
-        // Add updated filters
-        var filters = ['all',
-                        ['>=', 'vario', vario],
-                        ['>=', 'alt_in', altitude]
-        ];
+        function loadNetcoupeFlight(flightId) {
+            var requestUrl = "https://igcheatmap.appspot.com/netcoupe/" + flightId;
+            $.ajax({
+                url: requestUrl,
+                type: 'GET',
+                context: document.body,
+                success: function (result) {
+                    // Get result metadata
+                    geojsontrack = result;
 
-        map.setFilter('layer-heatmap', filters);
-        map.setFilter('layer-vario-value', filters);
+                    // --- Add data source ---
+                    map.addSource('source-flight-track' + flightId, {
+                        type: 'geojson',
+                        tolerance: 0,
+                        data: geojsontrack
+                    });
 
-        // Set the labels
-        $('#vario-label').html(vario);
-        $('#label-altitude-in').html(altitude);
-    }
+                    map.addLayer(
+                        {
+                            "id": "flight-track-" + flightId,
+                            "type": "line",
+                            "source": "source-flight-track" + flightId,
+                            "layout": {},
+                            "paint": {"line-color": "hsl(226, 78%, 49%)", "line-width": 3}
+                        }
+                    );
 
-    // ---------- Document loaded ----------
-    $(function() {
-        $.ajax({
-            url: metadataJsonSourceUrl,
-            type: 'GET',
-            context: document.body,
-            success: function (result) {
-                // Get result metadata
-                metadata = result;
-                targetDate = $.format.date(metadata.targetDate, "dd/MM/yyyy");
-                startDate = $.format.date(metadata.startDate, "dd/MM/yyyy HH:mm:ss");
-                duration = metadata.duration;
-                flightsCount = metadata.flightsCount;
-                thermalsCount = metadata.thermalsCount;
+                    map.triggerRepaint();
 
-                // Populate information panel
-                $('#target-date').html(targetDate);
-                $('#start-date').html(startDate);
-                $('#duration').html(duration);
-                $('#flights-count').html(flightsCount);
-                $('#thermals-count').html(thermalsCount);
-            },
-
-            error: function(result, status, errorThrown) {
-                console.log(errorThrown);
-            }
-
-
-        });
-    });
+                    // Toastr feedback
+                    toastr["success"]("Vol Netcoupe #" + flightId, "Vol chargé");
+                },
+                error: function(result) {
+                    console.log(errorThrown);
+                    if (result.status == 404) {
+                        toastr["error"]("Le vol n'éxiste pas !","Vol Netcoupe #" + flightId);
+                    } else {
+                        toastr["error"]("Probleme au chargement du vol !","Vol Netcoupe #" + flightId);
+                    }
+                    
+                }
+            });
+        }
 
 
-</script>
- 
+    </script>
+
 </body>
 </html>

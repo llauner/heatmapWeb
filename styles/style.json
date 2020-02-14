@@ -282,9 +282,7 @@
             [ "natural-features", "natural-labels" ],
             [ "point-of-interest-labels", "poi-labels" ],
             [ "transit", "transit-labels" ],
-            [ "place-labels", "place-labels" ],
-            "2019-heatmap-Ludovic",
-            "2019-Symbol-Ludovic"
+            [ "place-labels", "place-labels" ]
           ]
         }
       ],
