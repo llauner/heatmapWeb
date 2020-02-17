@@ -72,6 +72,7 @@
     <Content Include="favicon.ico" />
     <Content Include="index.html" />
     <Content Include="js\heatmap.js" />
+    <Content Include="js\application.js" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
