@@ -1,17 +1,6 @@
 ﻿.container {
-    display: flex;
-    flex-wrap: wrap;
-    flex-direction: row;
-    justify-content: start;
-    align-items: auto;
-    align-content: start
+    padding-left: 0px;
 }
-
-.item {
-    flex: 0 0 auto;
-    margin: 2px;
-}
-
 .thick {
     font-weight: bold;
     font-size: 18px;
@@ -22,6 +11,11 @@
 }
 
 .map-overlay {
-    min-width: 280px;
-    max-width: 300px;
+    min-width: 300px;
+    max-width: 350px;
+}
+
+.disabled-button{
+    opacity: 0.5;
+    pointer-events: none;
 }

@@ -3,15 +3,13 @@
 <head>
     <meta charset="utf-8" />
     <title>Thermals Heatmap</title>
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-    <meta http-equiv="Pragma" content="no-cache" />
-    <meta http-equiv="Expires" content="0" />
     <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
-    
+
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.css">
     <link rel="stylesheet" href="css/mapbox.css">
     <link rel="stylesheet" href="css/heatmap.css">
+
 
     <script src="https://api.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.js"></script>
     <link href="https://api.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.css" rel="stylesheet" />
@@ -19,47 +17,81 @@
 
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
-    <script src=" https://cdnjs.cloudflare.com/ajax/libs/jquery-dateFormat/1.0/jquery.dateFormat.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
     <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="https://use.fontawesome.com/86327f356b.js"></script>
     <script src="js/application.js"></script>
 </head>
 <body>
     <div id="map"></div>
-    <!---------- Information overlay ---------->
+<!---------- Information overlay ---------->
     <div class="map-overlay top">
         <div class="map-overlay-inner">
             <div class="container">
-                <div class="item">Jour de vol:</div>
-                <div id="target-date" class="item thick"></div>
+                <div class="row">
+                    <div class="col-sm-2">
+                        <div class="item">Date</div>
+                    </div>
+                    <div class="col-sm-2">
+                        <button type="button" class="btn fa fa-backward" id="btn-day-backward" />
+                    </div>
+                    <div class="col-sm-5">
+                        <div id="target-date" class="item thick"></div>
+                    </div>
+                    <div class="col-sm-2">
+                        <button type="button" class="btn fa fa-forward" id="btn-day-forward" />
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="item">Analyse du:</div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div id="start-date" class="item"></div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="item">Durée calcul:</div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div id="duration" class="item"></div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="item">Nb Vols:</div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div id="flights-count" class="item"></div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="item">Nb Thermiques:</div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div id="thermals-count" class="item"></div>
+                    </div>
+                </div>
             </div>
-            <div class="container">
-                <div class="item">Analyse du:</div>
-                <div id="start-date" class="item">ff</div>
-            </div>
-            <div class="container">
-                <div class="item">Durée calcul:</div>
-                <div id="duration" class="item"></div>
-            </div>
-            <div class="container">
-                <div class="item">Nb Vols:</div>
-                <div id="flights-count" class="item"></div>
-            </div>
-            <div class="container">
-                <div class="item">Nb Thermiques:</div>
-                <div id="thermals-count" class="item"></div>
-            </div>
+
         </div>
 
         <!---------- Flight selection ---------->
         <div class="map-overlay-inner container">
             <h6 class="font-weight-bold">Trace de vol Netcoupe</h6>
-            
             <div class="row">
                 <div class="col-sm-8">
                     <div class="input-group input-group-sm mb-3">
                         <div class="input-group-prepend">
-                            <span class="input-group-text" id="lbl-id" data-toggle="tooltip" title="Disabled tooltip">ID</span>
+                            <span class="input-group-text" id="lbl-id" data-toggle="tooltip" title="">ID</span>
                         </div>
                         <input type="number" class="form-control" placeholder="#" aria-label="Username" aria-describedby="basic-addon1" id="lbl-flight-id"/>
                     </div>
@@ -91,6 +123,7 @@
         const storageBaseUrl = "geojson/";
         const heatMapFileNamePrefix = "-heatmap.geojson";
         const metaDataFileNamePrefix = "-metadata.json";
+        var targetDate = null;
         var varioFilterValue = 1;
         var altInFilterValue = 0;
         var trackIds = [];              // List of Netcoupe volId currently 
@@ -117,6 +150,7 @@
         // --- Apply queystring parameters ---
         // Target day
         if (targetDayParam) {
+            targetDate = moment(targetDayParam, "YYYY_MM_DD");
             geojsonTargetDataSourceUrl = storageBaseUrl + targetDayParam + heatMapFileNamePrefix;
             metadataJsonSourceUrl = storageBaseUrl + targetDayParam + metaDataFileNamePrefix;
         }
@@ -132,32 +166,75 @@
                 success: function (result) {
                     // Get result metadata
                     metadata = result;
-                    targetDate = $.format.date(metadata.targetDate, "dd/MM/yyyy");
-                    startDate = $.format.date(metadata.startDate, "dd/MM/yyyy HH:mm:ss");
+                    targetDate = moment(metadata.targetDate, "YYYY_MM_DD");
+                    startDate = moment(metadata.startDate, "YYYY_MM_DD HH:mm:ss");
+
+                    targetDateToDisplay = targetDate.format("DD/MM/YYYY");
+                    startDateToDisplay = moment(startDate).format("DD/MM/YYYY HH:mm:ss");
                     duration = metadata.duration;
                     flightsCount = metadata.flightsCount;
                     thermalsCount = metadata.thermalsCount;
 
+                    // --- Init interface ---
                     // Populate information panel
-                    $('#target-date').html(targetDate);
-                    $('#start-date').html(startDate);
+                    $('#target-date').html(targetDateToDisplay);
+                    $('#start-date').html(startDateToDisplay);
                     $('#duration').html(duration);
                     $('#flights-count').html(flightsCount);
                     $('#thermals-count').html(thermalsCount);
+
+                    // Show / hide buttons
+                    var isFlightSameDayAsRun = moment(targetDate).isSame(startDate, 'day');
+
+                    var deltaDays = startDate.diff(targetDate, 'days');
+                    var deltaDaysNow = moment().diff(targetDate, 'days');
+                    var isLatestAvailable = deltaDays === 1 && deltaDaysNow === 1;
+
+
+                    if(isFlightSameDayAsRun || isLatestAvailable)
+                    {
+                        $('#btn-day-forward').addClass('disabled-button');
+                    }
+                    else
+                    {
+                        $('#btn-day-forward').removeClass('disabled-button');
+                    }
+                   
                 },
 
                 error: function (result, status, errorThrown) {
                     console.log(errorThrown);
+
+                    // --- Init interface ---
+                    // Populate information panel
+                    var targetDateToDisplay = moment(targetDate).format("DD/MM/YYYY");
+                    $('#target-date').html(targetDateToDisplay);
+
+                    toastr["error"]("Pas de carte disponibe pour ce jour: " + targetDateToDisplay);
                 }
             });
 
-            // ----- Event handler for flight -----
+
+  
+            // ----- Event handlers -----
+            // --- Flight
             $('#btn-get-flight').on('click',
                 function () {
                     flightId = $('#lbl-flight-id').val();
                     console.log("Loading Netcoupe flight#" + flightId);
                     loadNetcoupeFlight(flightId);
                 });
+            // --- Day + 1
+            $('#btn-day-forward').on('click',
+                function () {
+                    reloadPage(1);
+                });
+            // --- Day + -1
+            $('#btn-day-backward').on('click',
+                function () {
+                    reloadPage(-1);
+                });
+
 
             // ----- Apply Querystring parameters -----
             // Netcoupe volId
@@ -171,6 +248,14 @@
 
         });
 
+        // Reload the page for the next / previous day
+        function reloadPage(deltaDay) {
+            newTargetDate = targetDate.add(deltaDay, 'd');
+            dayParam = newTargetDate.format("YYYY_MM_DD");
+            location.href='?day=' + dayParam;
+        }
+
+        // --- Load the Flight from the Netcoupe ---
         function loadNetcoupeFlight(flightId) {
             // Check that the flight is not alrady there
             flightId = parseInt(flightId);
