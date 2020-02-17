@@ -176,22 +176,22 @@
                     thermalsCount = metadata.thermalsCount;
 
                     // --- Init interface ---
-                    // Populate information panel
+                    // --- Populate information panel
                     $('#target-date').html(targetDateToDisplay);
                     $('#start-date').html(startDateToDisplay);
                     $('#duration').html(duration);
                     $('#flights-count').html(flightsCount);
                     $('#thermals-count').html(thermalsCount);
 
-                    // Show / hide buttons
+                    // --- Show / hide buttons
                     var isFlightSameDayAsRun = moment(targetDate).isSame(startDate, 'day');
+                    var isTodayTargetDay = moment().diff(targetDate, 'days') === 0;
 
                     var deltaDays = startDate.diff(targetDate, 'days');
                     var deltaDaysNow = moment().diff(targetDate, 'days');
                     var isLatestAvailable = deltaDays === 1 && deltaDaysNow === 1;
 
-
-                    if(isFlightSameDayAsRun || isLatestAvailable)
+                    if((isFlightSameDayAsRun && isTodayTargetDay) || isLatestAvailable)
                     {
                         $('#btn-day-forward').addClass('disabled-button');
                     }
@@ -201,7 +201,6 @@
                     }
                    
                 },
-
                 error: function (result, status, errorThrown) {
                     console.log(errorThrown);
 
@@ -215,7 +214,6 @@
             });
 
 
-  
             // ----- Event handlers -----
             // --- Flight
             $('#btn-get-flight').on('click',
