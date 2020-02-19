@@ -19,3 +19,26 @@
     opacity: 0.5;
     pointer-events: none;
 }
+
+.dropzone {
+    background: white;
+    border-radius: 5px;
+    border: 2px dashed rgb(0, 135, 247);
+    border-image: none;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0px 0px;
+    min-height: 50px;
+    height: 110px;
+    width: 150px;
+}
+
+.dropzone .dz-message {
+    margin: 0 0;
+    }
+
+.foot-note {
+    font-size: 7pt; 
+    color: #9E9E9E;  
+}
