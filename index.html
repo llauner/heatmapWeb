@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.7.0/min/dropzone.min.css">
+    <link rel="stylesheet" href="js/vis/vis.min.css">
     <link rel="stylesheet" href="css/mapbox.css">
     <link rel="stylesheet" href="css/heatmap.css">
 
@@ -19,337 +20,345 @@
     <script src="https://api.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.js"></script>
     <link href="https://api.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.css" rel="stylesheet" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
     <script src="https://d3js.org/d3.v5.min.js"></script>
     <script src="https://use.fontawesome.com/86327f356b.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.7.0/min/dropzone.min.js"></script>
+    <!--<script src="js/vis/vis.min.js"></script>-->
     <script src="js/application.js"></script>
 </head>
 <body>
     <div id="map"></div>
 <!---------- Information overlay ---------->
-    <div class="map-overlay top">
-        <div class="map-overlay-inner">
-            <div class="container">
-                <div class="row">
-                    <div class="col-sm-2">
-                        <div class="item">Date</div>
-                    </div>
-                    <div class="col-sm-2">
-                        <button type="button" class="btn fa fa-backward" id="btn-day-backward" />
-                    </div>
-                    <div class="col-sm-5">
-                        <div id="target-date" class="item thick"></div>
-                    </div>
-                    <div class="col-sm-2">
-                        <button type="button" class="btn fa fa-forward" id="btn-day-forward" />
-                    </div>
+<div class="map-overlay top">
+    <div class="map-overlay-inner">
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-2">
+                    <div class="item">Date</div>
                 </div>
-
-                <div class="row">
-                    <div class="col-sm-6">
-                        <div class="item">Analyse du:</div>
-                    </div>
-                    <div class="col-sm-6">
-                        <div id="start-date" class="item"></div>
-                    </div>
+                <div class="col-sm-2">
+                    <button type="button" class="btn fa fa-backward" id="btn-day-backward" />
                 </div>
-
-                <div class="row">
-                    <div class="col-sm-6">
-                        <div class="item">Durée calcul:</div>
-                    </div>
-                    <div class="col-sm-6">
-                        <div id="duration" class="item"></div>
-                    </div>
+                <div class="col-sm-5">
+                    <div id="target-date" class="item thick"></div>
                 </div>
-
-                <div class="row">
-                    <div class="col-sm-6">
-                        <div class="item">Nb Vols:</div>
-                    </div>
-                    <div class="col-sm-6">
-                        <div id="flights-count" class="item"></div>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-sm-6">
-                        <div class="item">Nb Thermiques:</div>
-                    </div>
-                    <div class="col-sm-6">
-                        <div id="thermals-count" class="item"></div>
-                    </div>
+                <div class="col-sm-2">
+                    <button type="button" class="btn fa fa-forward" id="btn-day-forward" />
                 </div>
             </div>
 
-        </div>
-
-        <!---------- Flight selection ---------->
-        <div class="map-overlay-inner container">
-            <h6 class="font-weight-bold">Trace de vol Netcoupe</h6>
             <div class="row">
-                <div class="col-sm-8">
-                    <div class="input-group input-group-sm mb-3">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text" id="lbl-id" data-toggle="tooltip" title="">ID</span>
+                <div class="col-sm-6">
+                    <div class="item">Analyse du:</div>
+                </div>
+                <div class="col-sm-6">
+                    <div id="start-date" class="item"></div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="item">Durée calcul:</div>
+                </div>
+                <div class="col-sm-6">
+                    <div id="duration" class="item"></div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="item">Nb Vols:</div>
+                </div>
+                <div class="col-sm-6">
+                    <div id="flights-count" class="item"></div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="item">Nb Thermiques:</div>
+                </div>
+                <div class="col-sm-6">
+                    <div id="thermals-count" class="item"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!---------- Flight selection ---------->
+    <div class="map-overlay-inner container">
+        <h6 class="font-weight-bold">Trace de vol Netcoupe</h6>
+        <div class="row">
+            <div class="col-sm-8">
+                <div class="input-group input-group-sm mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="lbl-id" data-toggle="tooltip" title="">ID</span>
+                    </div>
+                    <input type="number" class="form-control" placeholder="#" aria-label="Username" aria-describedby="basic-addon1" id="lbl-flight-id" />
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <button type="button" class="btn btn-outline-dark btn-sm" id="btn-get-flight">Go</button>
+            </div>
+        </div>
+        <!-- Upload form-->
+        <h6 class="font-weight-bold">Fichier .igc</h6>
+        <div class="row">
+            <div class="col-sm-8">
+                <DIV id="dropzone">
+                    <form class="dropzone needsclick" id="igc-upload" action="/upload">
+                        <div class="dz-message needsclick">                                
+                            Déplacez un fichier .igc ici ou clickez...                                
+                            <p class="foot-note">Les fichiers ne sont pas stockés, le traitement se fait entierement en mémoire.</p>
                         </div>
-                        <input type="number" class="form-control" placeholder="#" aria-label="Username" aria-describedby="basic-addon1" id="lbl-flight-id" />
-                    </div>
-                </div>
-                <div class="col-sm-4">
-                    <button type="button" class="btn btn-outline-dark btn-sm" id="btn-get-flight">Go</button>
-                </div>
+                    </form>
+                </DIV>
             </div>
-            <!-- Upload form-->
-            <h6 class="font-weight-bold">Fichier .igc</h6>
+        </div>
+    </div>
+
+    <!---------- Vario selection ---------->
+    <div class="map-overlay-inner">
+        <h6 class="font-weight-bold">Vario (m/s)</h6>
+        <label id="vario-label"></label>
+        <input id="slider" type="range" min="0" max="5" step="0.1" value="1.0" />
+    </div>
+
+    <!---------- Altitude selelection ----------->
+    <div class="map-overlay-inner">
+        <h6 class="font-weight-bold">Altitude départ Vario (m)</h6>
+        <label id="label-altitude-in"></label>
+        <input id="slider-altitude-in" type="range" min="0" max="5000" step="100" value="0" />
+    </div>
+</div>
+<!---------- Flight timeline ---------
+<div class="map-overlay map-overlay-timeline fixed-bottom bottom">
+    <div class="map-overlay-inner">
+        <div class="container">
             <div class="row">
-                <div class="col-sm-8">
-                    <DIV id="dropzone">
-                        <FORM class="dropzone needsclick" id="igc-upload" action="/upload">
-                            <DIV class="dz-message needsclick">
-                                Déplacez un fichier .igc ici ou clickez...<BR>
-                                <span class="foot-note">Les fichiers ne sont pas stockés, le traitement se fait entierement en mémoire.</span>
-                            </DIV>
-                        </FORM>
-                    </DIV>
+                <div class="col-sm-12">
+                    <div id="visualization"></div>
                 </div>
             </div>
         </div>
-
-            <!---------- Vario selection ---------->
-            <div class="map-overlay-inner">
-                <h6 class="font-weight-bold">Vario (m/s)</h6>
-                <label id="vario-label"></label>
-                <input id="slider" type="range" min="0" max="5" step="0.1" value="1.0" />
-            </div>
-
-            <!---------- Altitude selelection ----------->
-            <div class="map-overlay-inner">
-                <h6 class="font-weight-bold">Altitude départ Vario (m)</h6>
-                <label id="label-altitude-in"></label>
-                <input id="slider-altitude-in" type="range" min="0" max="5000" step="100" value="0" />
-            </div>
-        </div>
-
+    </div>
+-->
     <script src="js/heatmap.js"></script>
-<script>
-    const HeatmapRestAPIEndpoint = "https://igcheatmap.appspot.com";
-    const storageBaseUrl = "geojson/";
-    const heatMapFileNamePrefix = "-heatmap.geojson";
-    const metaDataFileNamePrefix = "-metadata.json";
-    var targetDate = null;
-    var varioFilterValue = 1;
-    var altInFilterValue = 0;
-    var trackIds = [];              // List of Netcoupe volId currently 
+    <script>
+        const HeatmapRestAPIEndpoint = "https://igcheatmap.appspot.com";
+        const storageBaseUrl = "geojson/";
+        const heatMapFileNamePrefix = "-heatmap.geojson";
+        const metaDataFileNamePrefix = "-metadata.json";
+        var targetDate = null;
+        var varioFilterValue = 1;
+        var altInFilterValue = 0;
+        var trackIds = [];              // List of Netcoupe volId currently
 
-    // Parse querystring parameters to extract desired day
-    // Expected date format = yyyy_mm_dd example: 2020_02_05
-    var queryString = window.location.search;
-    targetDayParam = null;
-    volIdParams = null;
+        // Parse querystring parameters to extract desired day
+        // Expected date format = yyyy_mm_dd example: 2020_02_05
+        var queryString = window.location.search;
+        targetDayParam = null;
+        volIdParams = null;
 
-    if (queryString) {
-        var urlParams = new URLSearchParams(queryString);
-        targetDayParam = urlParams.get('day');
-        volIdParams = urlParams.get('volId');
-        if (volIdParams) {
-            volIdParams = $.map(volIdParams.split(","), $.trim);
-        }
-    }
-
-    // Build geojson and metadata  filename
-    var geojsonTargetDataSourceUrl = storageBaseUrl + "latest" + heatMapFileNamePrefix;
-    var metadataJsonSourceUrl = storageBaseUrl + "latest" + metaDataFileNamePrefix;
-
-    // --- Apply queystring parameters ---
-    // Target day
-    if (targetDayParam) {
-        targetDate = moment(targetDayParam, "YYYY_MM_DD");
-        geojsonTargetDataSourceUrl = storageBaseUrl + targetDayParam + heatMapFileNamePrefix;
-        metadataJsonSourceUrl = storageBaseUrl + targetDayParam + metaDataFileNamePrefix;
-    }
-
-    Dropzone.autoDiscover = false;
-
-    // ---------- Document loaded ----------
-    $(function () {
-
-
-        setupDropZone();    // Setup the dropzone upload
-
-        // ----- Load heatmap -----
-        $.ajax({
-            url: metadataJsonSourceUrl,
-            type: 'GET',
-            context: document.body,
-            success: function (result) {
-                // Get result metadata
-                metadata = result;
-                targetDate = moment(metadata.targetDate, "YYYY_MM_DD");
-                startDate = moment(metadata.startDate, "YYYY_MM_DD HH:mm:ss");
-
-                targetDateToDisplay = targetDate.format("DD/MM/YYYY");
-                startDateToDisplay = moment(startDate).format("DD/MM/YYYY HH:mm:ss");
-                duration = metadata.duration;
-                flightsCount = metadata.flightsCount;
-                thermalsCount = metadata.thermalsCount;
-
-                // --- Init interface ---
-                // --- Populate information panel
-                $('#target-date').html(targetDateToDisplay);
-                $('#start-date').html(startDateToDisplay);
-                $('#duration').html(duration);
-                $('#flights-count').html(flightsCount);
-                $('#thermals-count').html(thermalsCount);
-
-                // --- Show / hide buttons
-                var isFlightSameDayAsRun = moment(targetDate).isSame(startDate, 'day');
-                var isTodayTargetDay = moment().diff(targetDate, 'days') === 0;
-
-                var deltaDays = startDate.diff(targetDate, 'days');
-                var deltaDaysNow = moment().diff(targetDate, 'days');
-                var isLatestAvailable = deltaDays === 1 && deltaDaysNow === 1;
-
-                if((isFlightSameDayAsRun && isTodayTargetDay) || isLatestAvailable)
-                {
-                    $('#btn-day-forward').addClass('disabled-button');
-                }
-                else
-                {
-                    $('#btn-day-forward').removeClass('disabled-button');
-                }
-                   
-            },
-            error: function (result, status, errorThrown) {
-                console.log(errorThrown);
-
-                // --- Init interface ---
-                // Populate information panel
-                var targetDateToDisplay = moment(targetDate).format("DD/MM/YYYY");
-                $('#target-date').html(targetDateToDisplay);
-
-                toastr["error"]("Pas de carte disponibe pour ce jour: " + targetDateToDisplay);
+        if (queryString) {
+            var urlParams = new URLSearchParams(queryString);
+            targetDayParam = urlParams.get('day');
+            volIdParams = urlParams.get('volId');
+            if (volIdParams) {
+                volIdParams = $.map(volIdParams.split(","), $.trim);
             }
-        });
-
-
-        // ----- Event handlers -----
-        // --- Flight
-        $('#btn-get-flight').on('click',
-            function () {
-                flightId = $('#lbl-flight-id').val();
-                console.log("Loading Netcoupe flight#" + flightId);
-                loadNetcoupeFlight(flightId);
-            });
-        // --- Day + 1
-        $('#btn-day-forward').on('click',
-            function () {
-                reloadPage(1);
-            });
-        // --- Day + -1
-        $('#btn-day-backward').on('click',
-            function () {
-                reloadPage(-1);
-            });
-
-
-        // ----- Apply Querystring parameters -----
-        // Netcoupe volId
-        if (volIdParams) {
-            volIdParams.forEach(e => {
-                if (parseInt(e)) {
-                    loadNetcoupeFlight(e); // Load flight
-                }
-            });
         }
 
-    });
+        // Build geojson and metadata  filename
+        var geojsonTargetDataSourceUrl = storageBaseUrl + "latest" + heatMapFileNamePrefix;
+        var metadataJsonSourceUrl = storageBaseUrl + "latest" + metaDataFileNamePrefix;
 
-    // Reload the page for the next / previous day
-    function reloadPage(deltaDay) {
-        newTargetDate = targetDate.add(deltaDay, 'd');
-        dayParam = newTargetDate.format("YYYY_MM_DD");
-        location.href='?day=' + dayParam;
-    }
-
-    // --- Load the Flight from the Netcoupe ---
-    function loadNetcoupeFlight(flightId, geojsontrack) {
-
-        // Check that the flight is not already there
-        // Check already done if the flight was uploaded from an igc file
-        if (isNetcoupeFlight(flightId)) {
-            checkFlightCanBeAdded(flightId);
+        // --- Apply queystring parameters ---
+        // Target day
+        if (targetDayParam) {
+            targetDate = moment(targetDayParam, "YYYY_MM_DD");
+            geojsonTargetDataSourceUrl = storageBaseUrl + targetDayParam + heatMapFileNamePrefix;
+            metadataJsonSourceUrl = storageBaseUrl + targetDayParam + metaDataFileNamePrefix;
         }
-            
 
-        // The track was not provided: get it from the REST API
-        if (!geojsontrack) {
-            var requestUrl = HeatmapRestAPIEndpoint + "/netcoupe/" + flightId;
+        Dropzone.autoDiscover = false;
+
+        // ---------- Document loaded ----------
+        $(function () {
+
+
+            setupDropZone();        // Setup the dropzone upload
+            //setupAltitudeChart();   // Setup the altitude chart
+
+            // ----- Load heatmap -----
             $.ajax({
-                url: requestUrl,
+                url: metadataJsonSourceUrl,
                 type: 'GET',
                 context: document.body,
-                success: function(result) {
+                success: function (result) {
                     // Get result metadata
-                    geojsontrack = result;
-                    addTrackToMap(geojsontrack, flightId);
-                },
-                error: function(result) {
-                    console.log(result);
-                    if (result.status == 404) {
-                        toastr["error"]("Le vol n'éxiste pas !", "Vol Netcoupe #" + flightId);
-                    } else {
-                        toastr["error"]("Probleme au chargement du vol !", "Vol Netcoupe #" + flightId);
+                    metadata = result;
+                    targetDate = moment(metadata.targetDate, "YYYY_MM_DD");
+                    startDate = moment(metadata.startDate, "YYYY_MM_DD HH:mm:ss");
+
+                    targetDateToDisplay = targetDate.format("DD/MM/YYYY");
+                    startDateToDisplay = moment(startDate).format("DD/MM/YYYY HH:mm:ss");
+                    duration = metadata.duration;
+                    flightsCount = metadata.flightsCount;
+                    thermalsCount = metadata.thermalsCount;
+
+                    // --- Init interface ---
+                    // --- Populate information panel
+                    $('#target-date').html(targetDateToDisplay);
+                    $('#start-date').html(startDateToDisplay);
+                    $('#duration').html(duration);
+                    $('#flights-count').html(flightsCount);
+                    $('#thermals-count').html(thermalsCount);
+
+                    // --- Show / hide buttons
+                    var isFlightSameDayAsRun = moment(targetDate).isSame(startDate, 'day');
+                    var isTodayTargetDay = moment().diff(targetDate, 'days') === 0;
+
+                    var deltaDays = startDate.diff(targetDate, 'days');
+                    var deltaDaysNow = moment().diff(targetDate, 'days');
+                    var isLatestAvailable = deltaDays === 1 && deltaDaysNow === 1;
+
+                    if ((isFlightSameDayAsRun && isTodayTargetDay) || isLatestAvailable) {
+                        $('#btn-day-forward').addClass('disabled-button');
+                    }
+                    else {
+                        $('#btn-day-forward').removeClass('disabled-button');
                     }
 
+                },
+                error: function (result, status, errorThrown) {
+                    console.log(errorThrown);
+
+                    // --- Init interface ---
+                    // Populate information panel
+                    var targetDateToDisplay = moment(targetDate).format("DD/MM/YYYY");
+                    $('#target-date').html(targetDateToDisplay);
+
+                    toastr["error"]("Pas de carte disponibe pour ce jour: " + targetDateToDisplay);
                 }
             });
-        } else {
-            addTrackToMap(geojsontrack, flightId);
-        }
-         
-    }
 
-    function addTrackToMap(geojsontrack, flightId) {
-        var isNetcpFlight = isNetcoupeFlight(flightId);
 
-        // --- Add data source ---
-        map.addSource('source-flight-track' + flightId, {
-            type: 'geojson',
-            tolerance: 0,
-            data: geojsontrack
+            // ----- Event handlers -----
+            // --- Flight
+            $('#btn-get-flight').on('click',
+                function () {
+                    flightId = $('#lbl-flight-id').val();
+                    console.log("Loading Netcoupe flight#" + flightId);
+                    loadNetcoupeFlight(flightId);
+                });
+            // --- Day + 1
+            $('#btn-day-forward').on('click',
+                function () {
+                    reloadPage(1);
+                });
+            // --- Day + -1
+            $('#btn-day-backward').on('click',
+                function () {
+                    reloadPage(-1);
+                });
+
+
+            // ----- Apply Querystring parameters -----
+            // Netcoupe volId
+            if (volIdParams) {
+                volIdParams.forEach(e => {
+                    if (parseInt(e)) {
+                        loadNetcoupeFlight(e); // Load flight
+                    }
+                });
+            }
+
         });
 
-        // Pick color for the new layer:
-        var colorIndex = trackIds.indexOf(flightId) % 10;
+        // Reload the page for the next / previous day
+        function reloadPage(deltaDay) {
+            newTargetDate = targetDate.add(deltaDay, 'd');
+            dayParam = newTargetDate.format("YYYY_MM_DD");
+            location.href = '?day=' + dayParam;
+        }
 
-        var hslColor = hexToHSL(d3.schemeCategory10[colorIndex]);
+        // --- Load the Flight from the Netcoupe ---
+        function loadNetcoupeFlight(flightId, geojsontrack) {
 
-        map.addLayer(
-            {
-                "id": "flight-track-" + flightId,
-                "type": "line",
-                "source": "source-flight-track" + flightId,
-                "layout": {},
-                "paint": {"line-color": hslColor, "line-width": 3}
+            // Check that the flight is not already there
+            // Check already done if the flight was uploaded from an igc file
+            if (isNetcoupeFlight(flightId)) {
+                checkFlightCanBeAdded(flightId);
             }
-        );
-
-        map.triggerRepaint();
-
-        // Toastr feedback
-        var message = (isNetcpFlight) ? "Vol Netcoupe #" : "Fichier igc: ";
-        toastr["success"](message + flightId, "Vol chargé");
-    }
 
 
-</script>
+            // The track was not provided: get it from the REST API
+            if (!geojsontrack) {
+                var requestUrl = HeatmapRestAPIEndpoint + "/netcoupe/" + flightId;
+                $.ajax({
+                    url: requestUrl,
+                    type: 'GET',
+                    context: document.body,
+                    success: function (result) {
+                        // Get result metadata
+                        geojsontrack = result;
+                        addTrackToMap(geojsontrack, flightId);
+                    },
+                    error: function (result) {
+                        console.log(result);
+                        if (result.status == 404) {
+                            toastr["error"]("Le vol n'éxiste pas !", "Vol Netcoupe #" + flightId);
+                        } else {
+                            toastr["error"]("Probleme au chargement du vol !", "Vol Netcoupe #" + flightId);
+                        }
+
+                    }
+                });
+            } else {
+                addTrackToMap(geojsontrack, flightId);
+            }
+
+        }
+
+        function addTrackToMap(geojsontrack, flightId) {
+            var isNetcpFlight = isNetcoupeFlight(flightId);
+
+            // --- Add data source ---
+            map.addSource('source-flight-track' + flightId, {
+                type: 'geojson',
+                tolerance: 0,
+                data: geojsontrack
+            });
+
+            // Pick color for the new layer:
+            var colorIndex = trackIds.indexOf(flightId) % 10;
+
+            var hslColor = hexToHSL(d3.schemeCategory10[colorIndex]);
+
+            map.addLayer(
+                {
+                    "id": "flight-track-" + flightId,
+                    "type": "line",
+                    "source": "source-flight-track" + flightId,
+                    "layout": {},
+                    "paint": { "line-color": hslColor, "line-width": 3 }
+                }
+            );
+
+            map.triggerRepaint();
+
+            // Toastr feedback
+            var message = (isNetcpFlight) ? "Vol Netcoupe #" : "Fichier igc: ";
+            toastr["success"](message + flightId, "Vol chargé");
+        }
+
+
+    </script>
 
 </body>
 </html>

@@ -73,6 +73,10 @@
     <Content Include="index.html" />
     <Content Include="js\heatmap.js" />
     <Content Include="js\application.js" />
+    <Content Include="js\vis\vis.css" />
+    <Content Include="js\vis\vis.js" />
+    <Content Include="js\vis\vis.min.css" />
+    <Content Include="js\vis\vis.min.js" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>

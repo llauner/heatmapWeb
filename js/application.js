@@ -120,7 +120,37 @@ function setupDropZone() {
         }
 
     });
+}
+
+
+// ---------- Setup altitude chart ----------
+function setupAltitudeChart() {
+
+    var container = document.getElementById("visualization");
+    var items = [
+        { x: "2020-02-17", y: 10 },
+        { x: "2020-02-18", y: 25 },
+        { x: "2020-02-19", y: 30 },
+        { x: "2020-02-20", y: 10 },
+        { x: "2020-02-21", y: 15 },
+        { x: "2020-02-22", y: 30 }
+    ];
+
+    var dataset = new vis.DataSet(items);
+    var options = {
+        showCurrentTime: false,
+        height: "200px",
+        timeAxis: { scale: 'hour', step: 1 },
+        start: "2020-02-17",
+        end: "2020-02-22"
+    };
+    var graph2d = new vis.Graph2d(container, dataset, options);
+    graph2d.addCustomTime(new Date());
+
+    graph2d.on('timechanged', function (e) {
+        console.log(e);
+    });
+
 
 
 }
-
