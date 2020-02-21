@@ -28,6 +28,7 @@
     <script src="https://use.fontawesome.com/86327f356b.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.7.0/min/dropzone.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.15/lodash.min.js"></script>
+    <script src="https://api.tiles.mapbox.com/mapbox.js/plugins/turf/v2.0.0/turf.min.js" charset="utf-8"></script>
     <script src="js/vis/vis.min.js"></script>
     <script src="js/heatmap.js"></script>
     <script src="js/application.js"></script>
@@ -161,6 +162,7 @@
             var trackIds = [];              // List of Netcoupe volId currently
 
             var map;
+            var timelineData;
             var gliderIconPoint;
 
             // Parse querystring parameters to extract desired day

@@ -122,66 +122,7 @@ function setupDropZone() {
     });
 }
 
-
-// ---------- Setup altitude chart ----------
-var timelineData = null;
-
-function setupAltitudeChart(geojsontrack, data) {
-    // Show container
-    $("#flight-timeline").removeClass('d-none');
-    // Setup graph
-    var container = document.getElementById("visualization");
-
-    var dataset = new vis.DataSet(data);
-    timelineData = data;
-
-    var options = {
-        showCurrentTime: false,
-        moveable: true,
-        zoomable: true,
-        height: "200px",
-        drawPoints: false,
-        timeAxis: { scale: 'hour', step: 1 },
-        dataAxis: {
-            left: {
-                range: {min:0},
-                title: {text: "Altitude"}
-            }
-
-                    },
-        start: moment(data[0].x).add(-15, "minutes").format(),
-        end: moment(data.pop().x).add(15, "minutes").format()
-    };
-    var graph2d = new vis.Graph2d(container, dataset, options);
-
-    // Add Custom vertical line
-    var midRange = Math.floor(data.length / 2);
-    graph2d.addCustomTime(data[midRange].x);
-
-    // Add Glider icon on track
-    var trackFeature = geojsontrack.features[10];
-    var point = trackFeature.geometry.coordinates[0];
-    setupGliderIconOnTrack(point);
-
-    // --- Event: timechange ---
-    graph2d.on('timechange', function (e) {
-        var selectedTime = moment(e.time);
-        var dataIndex = _.findIndex(timelineData, function (d) { return moment(d.x).isSameOrAfter(selectedTime); });
-
-        if (dataIndex !== -1) {
-            var targetData = timelineData[dataIndex];
-            var trackFeature = geojsontrack.features[dataIndex];
-            var point = trackFeature.geometry.coordinates[0];
-            var pointProperties = trackFeature.properties;
-
-            // Update the glider icon location
-            gliderIconPoint.features[0].geometry.coordinates = point;
-            map.getSource('glider-point').setData(gliderIconPoint);
-        }
-    });
-}
-
-// ----------------------------------------------------- Glider Track ---------------------------------------------------------
+// ---------- Setupd and configure glider icon on map ---------
 function setupGliderIconOnTrack(originLocation) {
     // A single point that animates along the route.
     // Coordinates are initially set to origin.
@@ -198,11 +139,15 @@ function setupGliderIconOnTrack(originLocation) {
         'type': 'symbol',
         'layout': {
             'icon-image': 'airport-15',
+            'icon-rotate': ['get', 'bearing'],
+            'icon-rotation-alignment': 'map',
             'icon-allow-overlap': true,
             'icon-ignore-placement': true
         }
     });
 }
+
+// ----------------------------------------------------- Glider Track ---------------------------------------------------------
 
 // --- addTrackToMap ---
 // Add the track onto the map
@@ -243,7 +188,17 @@ function addTrackToMap(geojsontrack, flightId) {
 
 // --- addTrackToTimeline ---
 function addTrackToTimeline(geojsontrack) {
-    var data = _.map(geojsontrack.features,
+    // HACK: take 1 element out of 2
+    // TODO: Remove elements so thar we're left with about 1500 features
+    // = find the division factor and apply it..
+    var simplifiedGeojsonTrack = _.clone(geojsontrack);
+    var compressionFactor = Math.round(simplifiedGeojsonTrack.features.length / 1500);
+
+    _.remove(simplifiedGeojsonTrack.features, function (value, index, array) {
+        return index % compressionFactor === 0;
+    });
+
+    var data = _.map(simplifiedGeojsonTrack.features,
         function (f) {
             var prop = f.properties;
             // Turn ts into hour
@@ -252,5 +207,64 @@ function addTrackToTimeline(geojsontrack) {
             return { x: ts, y: prop.alt };
         });
 
-    setupAltitudeChart(geojsontrack, data);   // Setup the altitude chart
+    setupAltitudeChart(simplifiedGeojsonTrack, data);   // Setup the altitude chart
+}
+
+// ---------- Setup altitude chart ----------
+function setupAltitudeChart(geojsontrack, data) {
+    // Show container
+    $("#flight-timeline").removeClass('d-none');
+    // Setup graph
+    var container = document.getElementById("visualization");
+
+    var dataset = new vis.DataSet(data);
+    timelineData = data;
+
+    var options = {
+        showCurrentTime: false,
+        moveable: true,
+        zoomable: true,
+        height: "200px",
+        drawPoints: false,
+        timeAxis: { scale: 'hour', step: 1 },
+        dataAxis: {
+            left: {
+                range: { min: 0 },
+                title: { text: "Altitude" }
+            }
+
+        },
+        start: moment(data[0].x).add(-15, "minutes").format(),
+        end: moment(data.pop().x).add(15, "minutes").format()
+    };
+    var graph2d = new vis.Graph2d(container, dataset, options);
+
+    // Add Custom vertical line
+    var midRange = Math.floor(data.length / 2);
+    graph2d.addCustomTime(data[midRange].x);
+
+    // Add Glider icon on track
+    var trackFeature = geojsontrack.features[0];
+    var point = trackFeature.geometry.coordinates[0];
+    setupGliderIconOnTrack(point);
+
+    // --- Event: timechange ---
+    graph2d.on('timechange', function (e) {
+        var selectedTime = moment(e.time);
+        var dataIndex = _.findIndex(timelineData, function (d) { return moment(d.x).isSameOrAfter(selectedTime); });
+
+        if (dataIndex !== -1) {
+            var targetData = timelineData[dataIndex];
+            var trackFeature = geojsontrack.features[dataIndex];
+            var point = trackFeature.geometry.coordinates[0];
+            var point2 = trackFeature.geometry.coordinates[1];
+
+            // --- Update the glider icon location
+            gliderIconPoint.features[0].geometry.coordinates = point;
+            // Bearing
+            gliderIconPoint.features[0].properties.bearing = turf.bearing(turf.point(point),turf.point(point2));
+
+            map.getSource('glider-point').setData(gliderIconPoint);
+        }
+    });
 }
