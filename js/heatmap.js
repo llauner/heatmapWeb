@@ -1,9 +1,20 @@
 ﻿mapboxgl.accessToken = 'pk.eyJ1IjoibHVkb3ZpY2xhdW5lciIsImEiOiJjazVtNzdvYzkwdTMzM2txa2xvaXJ0ZnY3In0.G6nft9RJo94MHqOOmIaYwA';
 
-var map = new mapboxgl.Map({
-    container: 'map',           // container id
-    style: "styles/style.json"
-});
+
+gliderIconPoint = {
+    'type': 'FeatureCollection',
+    'features': [
+        {
+            'type': 'Feature',
+            'properties': {},
+            'geometry': {
+                'type': 'Point',
+                'coordinates': null
+            }
+        }
+    ]
+};
+
 
 function filterBy(vario, altitude) {
     // Add updated filters
@@ -20,9 +31,15 @@ function filterBy(vario, altitude) {
     $('#label-altitude-in').html(altitude);
 }
 
-map.on('load',
-    function () {
 
+function initHeatMap() {
+    map = new mapboxgl.Map({
+        container: 'map',           // container id
+        style: "styles/style.json"
+    });
+
+    map.on('load',
+    function () {
         // --- Add data source ---
         map.addSource('latest-data', {
             type: 'geojson',
@@ -141,3 +158,4 @@ map.on('load',
                 filterBy(varioFilterValue, altInFilterValue);
             });
     });
+}

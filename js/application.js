@@ -124,33 +124,133 @@ function setupDropZone() {
 
 
 // ---------- Setup altitude chart ----------
-function setupAltitudeChart() {
+var timelineData = null;
 
+function setupAltitudeChart(geojsontrack, data) {
+    // Show container
+    $("#flight-timeline").removeClass('d-none');
+    // Setup graph
     var container = document.getElementById("visualization");
-    var items = [
-        { x: "2020-02-17", y: 10 },
-        { x: "2020-02-18", y: 25 },
-        { x: "2020-02-19", y: 30 },
-        { x: "2020-02-20", y: 10 },
-        { x: "2020-02-21", y: 15 },
-        { x: "2020-02-22", y: 30 }
-    ];
 
-    var dataset = new vis.DataSet(items);
+    var dataset = new vis.DataSet(data);
+    timelineData = data;
+
     var options = {
         showCurrentTime: false,
+        moveable: true,
+        zoomable: true,
         height: "200px",
+        drawPoints: false,
         timeAxis: { scale: 'hour', step: 1 },
-        start: "2020-02-17",
-        end: "2020-02-22"
+        dataAxis: {
+            left: {
+                range: {min:0},
+                title: {text: "Altitude"}
+            }
+
+                    },
+        start: moment(data[0].x).add(-15, "minutes").format(),
+        end: moment(data.pop().x).add(15, "minutes").format()
     };
     var graph2d = new vis.Graph2d(container, dataset, options);
-    graph2d.addCustomTime(new Date());
 
-    graph2d.on('timechanged', function (e) {
-        console.log(e);
+    // Add Custom vertical line
+    var midRange = Math.floor(data.length / 2);
+    graph2d.addCustomTime(data[midRange].x);
+
+    // Add Glider icon on track
+    var trackFeature = geojsontrack.features[10];
+    var point = trackFeature.geometry.coordinates[0];
+    setupGliderIconOnTrack(point);
+
+    // --- Event: timechange ---
+    graph2d.on('timechange', function (e) {
+        var selectedTime = moment(e.time);
+        var dataIndex = _.findIndex(timelineData, function (d) { return moment(d.x).isSameOrAfter(selectedTime); });
+
+        if (dataIndex !== -1) {
+            var targetData = timelineData[dataIndex];
+            var trackFeature = geojsontrack.features[dataIndex];
+            var point = trackFeature.geometry.coordinates[0];
+            var pointProperties = trackFeature.properties;
+
+            // Update the glider icon location
+            gliderIconPoint.features[0].geometry.coordinates = point;
+            map.getSource('glider-point').setData(gliderIconPoint);
+        }
+    });
+}
+
+// ----------------------------------------------------- Glider Track ---------------------------------------------------------
+function setupGliderIconOnTrack(originLocation) {
+    // A single point that animates along the route.
+    // Coordinates are initially set to origin.
+    gliderIconPoint.features[0].geometry.coordinates = originLocation;
+
+    map.addSource('glider-point', {
+        'type': 'geojson',
+        'data': gliderIconPoint
     });
 
+    map.addLayer({
+        'id': 'layer-glider-point',
+        'source': 'glider-point',
+        'type': 'symbol',
+        'layout': {
+            'icon-image': 'airport-15',
+            'icon-allow-overlap': true,
+            'icon-ignore-placement': true
+        }
+    });
+}
 
+// --- addTrackToMap ---
+// Add the track onto the map
+function addTrackToMap(geojsontrack, flightId) {
+    var isNetcpFlight = isNetcoupeFlight(flightId);
 
+    // --- Add data source ---
+    map.addSource('source-flight-track' + flightId, {
+        type: 'geojson',
+        tolerance: 0,
+        data: geojsontrack
+    });
+
+    // Pick color for the new layer:
+    var colorIndex = trackIds.indexOf(flightId) % 10;
+
+    var hslColor = hexToHSL(d3.schemeCategory10[colorIndex]);
+
+    map.addLayer(
+        {
+            "id": "flight-track-" + flightId,
+            "type": "line",
+            "source": "source-flight-track" + flightId,
+            "layout": {},
+            "paint": { "line-color": hslColor, "line-width": 3 }
+        }
+    );
+
+    map.triggerRepaint();
+
+    // Toastr feedback
+    var message = (isNetcpFlight) ? "Vol Netcoupe #" : "Fichier igc: ";
+    toastr["success"](message + flightId, "Vol chargé");
+
+    // Update timelinme
+    addTrackToTimeline(geojsontrack);
+}
+
+// --- addTrackToTimeline ---
+function addTrackToTimeline(geojsontrack) {
+    var data = _.map(geojsontrack.features,
+        function (f) {
+            var prop = f.properties;
+            // Turn ts into hour
+            var epoch = moment(prop.ts * 1000);
+            var ts = epoch.format();
+            return { x: ts, y: prop.alt };
+        });
+
+    setupAltitudeChart(geojsontrack, data);   // Setup the altitude chart
 }
