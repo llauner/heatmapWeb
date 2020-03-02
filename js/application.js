@@ -69,6 +69,11 @@ function isNetcoupeFlight(flightId) {
     return isNetcoupeFlight;
 }
 
+function getTrackHexColor(flightId) {
+    var colorIndex = trackIds.indexOf(flightId) % 10;
+    return d3.schemeCategory10[colorIndex];
+}
+
 // checkFlightCanBeAdded
 // Checks that the flight can be added onto the map
 // = True if it's not already processed
@@ -123,7 +128,7 @@ function setupDropZone() {
 }
 
 // ---------- Setupd and configure glider icon on map ---------
-function setupGliderIconOnTrack(originLocation) {
+function setupGliderIconOnTrack(originLocation, flightId) {
     // A single point that animates along the route.
     // Coordinates are initially set to origin.
     gliderIconPoint.features[0].geometry.coordinates = originLocation;
@@ -133,18 +138,38 @@ function setupGliderIconOnTrack(originLocation) {
         'data': gliderIconPoint
     });
 
-    map.addLayer({
-        'id': 'layer-glider-point',
-        'source': 'glider-point',
-        'type': 'symbol',
-        'layout': {
-            'icon-image': 'airport-15',
-            'icon-rotate': ['get', 'bearing'],
-            'icon-rotation-alignment': 'map',
-            'icon-allow-overlap': true,
-            'icon-ignore-placement': true
-        }
-    });
+    var haloColor = getTrackHexColor(flightId);
+
+    map.loadImage("/images/glider.png",
+        function(error0, image0) {
+            if (error0) throw error0;
+            map.addImage("image",
+                image0,
+                {
+                    "sdf": "true"
+                });
+
+            map.addLayer({
+                "id": "layer-glider-point",
+                'source': 'glider-point',
+                "type": "symbol",
+                "layout": {
+                    "icon-image": "image",
+                    "icon-allow-overlap": true,
+                    'icon-rotate': ['get', 'bearing'],
+                    'icon-rotation-alignment': 'map',
+                    'icon-ignore-placement': true,
+                    'icon-size': 0.5
+                },
+                "paint": {
+                    "icon-color": "#ffffff",
+                    "icon-halo-color": haloColor,
+                    "icon-halo-width": 2
+                }
+            });
+        });
+
+
 }
 
 // ----------------------------------------------------- Glider Track ---------------------------------------------------------
@@ -162,9 +187,7 @@ function addTrackToMap(geojsontrack, flightId) {
     });
 
     // Pick color for the new layer:
-    var colorIndex = trackIds.indexOf(flightId) % 10;
-
-    var hslColor = hexToHSL(d3.schemeCategory10[colorIndex]);
+    var hslColor = hexToHSL(getTrackHexColor(flightId));
 
     map.addLayer(
         {
@@ -183,35 +206,37 @@ function addTrackToMap(geojsontrack, flightId) {
     toastr["success"](message + flightId, "Vol chargé");
 
     // Update timelinme
-    addTrackToTimeline(geojsontrack);
+    addTrackToTimeline(geojsontrack, flightId);
 }
 
-// --- addTrackToTimeline ---
-function addTrackToTimeline(geojsontrack) {
-    // HACK: take 1 element out of 2
-    // TODO: Remove elements so thar we're left with about 1500 features
-    // = find the division factor and apply it..
-    var simplifiedGeojsonTrack = _.clone(geojsontrack);
-    var compressionFactor = Math.round(simplifiedGeojsonTrack.features.length / 1500);
+// ----------------------------------------------------- Glider Timeline -----------------------------------------------------
+function addTrackToTimeline(geojsontrack, flightId) {
+    var isShowTimeline = $('#switch-navigator').is(':checked');
 
-    _.remove(simplifiedGeojsonTrack.features, function (value, index, array) {
-        return index % compressionFactor === 0;
-    });
+    if (isShowTimeline) {
+        // HACK: Remove elements so that we're left with +/- 500 features
+        var simplifiedGeojsonTrack = _.clone(geojsontrack);
+        var compressionFactor = Math.round(simplifiedGeojsonTrack.features.length / 500);
 
-    var data = _.map(simplifiedGeojsonTrack.features,
-        function (f) {
-            var prop = f.properties;
-            // Turn ts into hour
-            var epoch = moment(prop.ts * 1000);
-            var ts = epoch.format();
-            return { x: ts, y: prop.alt };
+        simplifiedGeojsonTrack.features = _.remove(simplifiedGeojsonTrack.features, function (value, index, array) {
+            return index % compressionFactor == 0;
         });
 
-    setupAltitudeChart(simplifiedGeojsonTrack, data);   // Setup the altitude chart
+        var data = _.map(simplifiedGeojsonTrack.features,
+            function (f) {
+                var prop = f.properties;
+                // Turn ts into hour
+                var epoch = moment(prop.ts * 1000);
+                var ts = epoch.format();
+                return { x: ts, y: prop.alt };
+            });
+
+        setupAltitudeChart(simplifiedGeojsonTrack, data, flightId);   // Setup the altitude chart
+    }
 }
 
 // ---------- Setup altitude chart ----------
-function setupAltitudeChart(geojsontrack, data) {
+function setupAltitudeChart(geojsontrack, data, flightId) {
     // Show container
     $("#flight-timeline").removeClass('d-none');
     // Setup graph
@@ -232,24 +257,35 @@ function setupAltitudeChart(geojsontrack, data) {
                 range: { min: 0 },
                 title: { text: "Altitude" }
             }
-
         },
         start: moment(data[0].x).add(-15, "minutes").format(),
-        end: moment(data.pop().x).add(15, "minutes").format()
+        end: moment(data.pop().x).add(15, "minutes").format(),
+        format: {
+            majorLabels: {
+                hour: 'D/MM/YYYY'
+            }
+        }
+
     };
     var graph2d = new vis.Graph2d(container, dataset, options);
 
     // Add Custom vertical line
-    var midRange = Math.floor(data.length / 2);
-    graph2d.addCustomTime(data[midRange].x);
+    graph2d.addCustomTime(data[0].x);
 
     // Add Glider icon on track
     var trackFeature = geojsontrack.features[0];
     var point = trackFeature.geometry.coordinates[0];
-    setupGliderIconOnTrack(point);
+    setupGliderIconOnTrack(point, flightId);
+
+    // Simulate time change so that the info is updated
+    graphTimeChangeHandler({ time: moment(geojsontrack.features[0].properties.ts * 1000) }); 
 
     // --- Event: timechange ---
-    graph2d.on('timechange', function (e) {
+    graph2d.on('timechange', function(e) {
+        graphTimeChangeHandler(e);
+    });
+
+    function graphTimeChangeHandler(e) {
         var selectedTime = moment(e.time);
         var dataIndex = _.findIndex(timelineData, function (d) { return moment(d.x).isSameOrAfter(selectedTime); });
 
@@ -259,12 +295,21 @@ function setupAltitudeChart(geojsontrack, data) {
             var point = trackFeature.geometry.coordinates[0];
             var point2 = trackFeature.geometry.coordinates[1];
 
+            var currentTime = selectedTime.format('HH:MM:ss');
+            var currrentAltitude = targetData.y;
+
             // --- Update the glider icon location
             gliderIconPoint.features[0].geometry.coordinates = point;
             // Bearing
-            gliderIconPoint.features[0].properties.bearing = turf.bearing(turf.point(point),turf.point(point2));
+            gliderIconPoint.features[0].properties.bearing = turf.bearing(turf.point(point), turf.point(point2));
 
             map.getSource('glider-point').setData(gliderIconPoint);
+
+            // --- Update time and latitude indication
+
+            $labelTrackTime.html(currentTime);
+            $labelTrackAltitude.html(currrentAltitude);
+
         }
-    });
+    }
 }

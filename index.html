@@ -122,6 +122,16 @@
                     </DIV>
                 </div>
             </div>
+            <!-- Flight navigator toggle button -->
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="custom-control custom-switch">
+                        <input type="checkbox" class="custom-control-input" id="switch-navigator" checked>
+                        <label class="custom-control-label" for="switch-navigator">Afficher graph altitude + navigateur</label>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
         <!---------- Vario selection ---------->
@@ -143,11 +153,17 @@
         <div class="map-overlay-inner">
             <div class="container">
                 <div class="row">
+                    <div class="col-sm-auto">Time:</div>
+                    <div class="col-sm-auto thick-base" id="current-track-time"></div>
+                    <div class="col-sm-auto">Alt (m):</div>
+                    <div class="col-sm-auto thick-base" id="current-track-altitude"></div>
+                </div>
+                <div class="row">
                     <div class="col-sm-12">
                         <div id="visualization"></div>
                     </div>
                 </div>
-            </div>
+                </div>
         </div>
     </div>
 
@@ -164,6 +180,9 @@
             var map;
             var timelineData;
             var gliderIconPoint;
+
+            var $labelTrackTime;
+            var $labelTrackAltitude;
 
             // Parse querystring parameters to extract desired day
             // Expected date format = yyyy_mm_dd example: 2020_02_05
@@ -196,6 +215,10 @@
 
             // ---------- Document loaded ----------
             $(function () {
+                // --- Get needed DOM elements ---
+                $labelTrackTime = $("#current-track-time");
+                $labelTrackAltitude = $("#current-track-altitude");
+
                 // ----- Setup heatmap -----
                 initHeatMap();          
 
@@ -273,7 +296,6 @@
                     function () {
                         reloadPage(-1);
                     });
-
 
                 // ----- Apply Querystring parameters -----
                 // Netcoupe volId
