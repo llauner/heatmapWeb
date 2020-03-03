@@ -16,12 +16,25 @@ gliderIconPoint = {
 };
 
 
-function filterBy(vario, altitude) {
+function filterBy(vario, altitude, timestamp) {
     // Add updated filters
     var filters = ['all',
         ['>=', 'vario', vario],
         ['>=', 'alt_in', altitude]
     ];
+
+    if (timestamp) {
+        var timeDelta = 30 * 60;
+        var epochStart = timestamp - timeDelta;
+        var epochEnd = timestamp + timeDelta;
+
+        filters = ['all',
+            ['>=', 'vario', vario],
+            ['>=', 'alt_in', altitude],
+            ['>=', 'ts', epochStart],
+            ['<=', 'ts', epochEnd]
+        ];
+    }
 
     map.setFilter('layer-heatmap', filters);
     map.setFilter('layer-vario-value', filters);

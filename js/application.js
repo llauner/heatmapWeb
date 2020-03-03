@@ -313,10 +313,11 @@ function setupAltitudeChart(geojsontrack, data, flightId) {
             map.getSource('glider-point').setData(gliderIconPoint);
 
             // --- Update time and latitude indication
-
             $labelTrackTime.html(currentTime);
             $labelTrackAltitude.html(currrentAltitude);
 
+            // --- Update the heatmap time filter ---
+            //filterBy(varioFilterValue, altInFilterValue, selectedTime.unix());
         }
     }
 }
