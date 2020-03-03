@@ -239,6 +239,9 @@ function addTrackToTimeline(geojsontrack, flightId) {
             });
 
         setupAltitudeChart(simplifiedGeojsonTrack, data, flightId);   // Setup the altitude chart
+
+        // Hide switch as it's now useless
+        $('#switch-navigator-container').addClass('d-none');
     }
 }
 
