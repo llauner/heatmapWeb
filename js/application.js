@@ -228,7 +228,7 @@ function addTrackToTimeline(geojsontrack, flightId) {
                 // Turn ts into hour
                 var epoch = moment(prop.ts * 1000);
                 var ts = epoch.format();
-                return { x: ts, y: prop.alt };
+                return { x: ts, y: prop.alt, group:0 };
             });
 
         setupAltitudeChart(simplifiedGeojsonTrack, data, flightId);   // Setup the altitude chart
@@ -279,6 +279,10 @@ function setupAltitudeChart(geojsontrack, data, flightId) {
 
     // Simulate time change so that the info is updated
     graphTimeChangeHandler({ time: moment(geojsontrack.features[0].properties.ts * 1000) }); 
+
+    // Change color to match the track color
+    var hexTrackColor = getTrackHexColor(flightId);
+    $('.vis-graph-group0').css('stroke', hexTrackColor);
 
     // --- Event: timechange ---
     graph2d.on('timechange', function(e) {
