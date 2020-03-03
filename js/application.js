@@ -69,6 +69,10 @@ function isNetcoupeFlight(flightId) {
     return isNetcoupeFlight;
 }
 
+function isTimeLineDefined() {
+    return (timelineData) ? true : false;
+}
+
 function getTrackHexColor(flightId) {
     var colorIndex = trackIds.indexOf(flightId) % 10;
     return d3.schemeCategory10[colorIndex];
@@ -206,7 +210,10 @@ function addTrackToMap(geojsontrack, flightId) {
     toastr["success"](message + flightId, "Vol chargé");
 
     // Update timelinme
-    addTrackToTimeline(geojsontrack, flightId);
+    if (!isTimeLineDefined()) {
+        addTrackToTimeline(geojsontrack, flightId);
+    }
+   
 }
 
 // ----------------------------------------------------- Glider Timeline -----------------------------------------------------
