@@ -20,8 +20,8 @@
 }
 
 .map-overlay-timeline {
-    min-width: 80%;
-    max-width: 90%;
+    max-width: 800px;
+    width: 70%;
 }
 
 .disabled-button{
