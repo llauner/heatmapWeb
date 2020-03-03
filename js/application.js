@@ -211,6 +211,7 @@ function addTrackToMap(geojsontrack, flightId) {
 
     // Update timelinme
     if (!isTimeLineDefined()) {
+        timelineGeojsonTrack = geojsontrack;
         addTrackToTimeline(geojsontrack, flightId);
     }
    
@@ -221,15 +222,7 @@ function addTrackToTimeline(geojsontrack, flightId) {
     var isShowTimeline = $('#switch-navigator').is(':checked');
 
     if (isShowTimeline) {
-        // HACK: Remove elements so that we're left with +/- 500 features
-        var simplifiedGeojsonTrack = _.clone(geojsontrack);
-        var compressionFactor = Math.round(simplifiedGeojsonTrack.features.length / 500);
-
-        simplifiedGeojsonTrack.features = _.remove(simplifiedGeojsonTrack.features, function (value, index, array) {
-            return index % compressionFactor == 0;
-        });
-
-        var data = _.map(simplifiedGeojsonTrack.features,
+        var data = _.map(geojsontrack.features,
             function (f) {
                 var prop = f.properties;
                 // Turn ts into hour
@@ -238,7 +231,7 @@ function addTrackToTimeline(geojsontrack, flightId) {
                 return { x: ts, y: prop.alt, group:0 };
             });
 
-        setupAltitudeChart(simplifiedGeojsonTrack, data, flightId);   // Setup the altitude chart
+        setupAltitudeChart(geojsontrack, data, flightId);   // Setup the altitude chart
 
         // Hide switch as it's now useless
         $('#switch-navigator-container').addClass('d-none');
@@ -305,11 +298,11 @@ function setupAltitudeChart(geojsontrack, data, flightId) {
 
         if (dataIndex !== -1) {
             var targetData = timelineData[dataIndex];
-            var trackFeature = geojsontrack.features[dataIndex];
+            var trackFeature = timelineGeojsonTrack.features[dataIndex];
             var point = trackFeature.geometry.coordinates[0];
             var point2 = trackFeature.geometry.coordinates[1];
 
-            var currentTime = selectedTime.format('HH:MM:ss');
+            var currentTime = selectedTime.format('HH:mm:ss');
             var currrentAltitude = targetData.y;
 
             // --- Update the glider icon location
