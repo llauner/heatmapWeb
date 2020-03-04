@@ -65,6 +65,7 @@ function initHeatMap() {
                 type: 'GET',
                 context: document.body,
                 success: function (result) {
+                    result = JSON.parse(result);
                     onHeatmapDataLoaded(result);
                 },
                 error: function (result, status, errorThrown) {
