@@ -126,7 +126,7 @@
             <div class="row" id="switch-navigator-container">
                 <div class="col-sm-12">
                     <div class="custom-control custom-switch">
-                        <input type="checkbox" class="custom-control-input" id="switch-navigator" checked>
+                        <input type="checkbox" class="custom-control-input d-none" id="switch-navigator" checked>
                         <label class="custom-control-label" for="switch-navigator">Afficher graph altitude + navigateur</label>
                     </div>
                 </div>
@@ -157,13 +157,29 @@
                     <div class="col-sm-auto thick-base" id="current-track-time"></div>
                     <div class="col-sm-auto">Alt (m):</div>
                     <div class="col-sm-auto thick-base" id="current-track-altitude"></div>
+                    
+                    <!-- Thermal time filter and tolerance -->
+                    <div class="custom-control custom-checkbox col-sm-auto" id="feature-heatmap-time-filter">
+                            <input type="checkbox" class="custom-control-input d-none" id="chk-time-filter">
+                            <label class="custom-control-label" for="chk-time-filter">Filtrer la Heatmap sur l'heure</label>
+                    </div>
+                    <div class="col-sm-3 d-none" id="div-time-filter-tolerance">
+                        <div class="input-group input-group-sm input-time-filter-tolerance">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="lbl-time-delta" data-toggle="tooltip" title="">+/- (min)</span>
+                            </div>
+                            <input type="number" class="form-control" aria-describedby="basic-addon1" id="time-delta" min="15" max="600" value="30" />
+                        </div>
+                    </div>
+                  
+
                 </div>
                 <div class="row">
                     <div class="col-sm-12">
                         <div id="visualization"></div>
                     </div>
                 </div>
-                </div>
+            </div>
         </div>
     </div>
 
@@ -172,10 +188,15 @@
             const storageBaseUrl = "geojson/";
             const heatMapFileNamePrefix = "-heatmap.geojson";
             const metaDataFileNamePrefix = "-metadata.json";
+
+            var heatmapGeojsonData;
+
             var targetDate = null;
             var varioFilterValue = 1;
             var altInFilterValue = 0;
-            var timestampFilterValue;
+            var heatmapTimeFilterToleranceValue = 30;
+            var isHeatmapTimeFilterOn = false;
+            
 
             var trackIds = [];              // List of Netcoupe volId currently
 
@@ -183,6 +204,7 @@
             var timelineData;
             var timelineGeojsonTrack;       // The interactive track data
             var gliderIconPoint;
+            var lastGraphTimeChangeEvent;
 
             var $labelTrackTime;
             var $labelTrackAltitude;
@@ -300,6 +322,29 @@
                         reloadPage(-1);
                     });
 
+                // --- Filter Heatmap on time ---
+                $('#chk-time-filter').on('change',
+                    function () {
+                        if ($("#chk-time-filter").is(':checked')) {
+                            // Filter is ON
+                            isHeatmapTimeFilterOn = true;
+                            $('#div-time-filter-tolerance').removeClass('d-none');
+                            graphTimeChangeHandler(lastGraphTimeChangeEvent);   // Update filter = turn ON
+                        } else {
+                            // Filter is OFF
+                            isHeatmapTimeFilterOn = false;
+                            $('#div-time-filter-tolerance').addClass('d-none');
+                            //Apply filter
+                            filterBy(varioFilterValue, altInFilterValue);   // Update filter = turn OFF
+                        }
+                    });
+
+                $('#time-delta').on('change',
+                    function () {
+                        heatmapTimeFilterToleranceValue = parseInt($('#time-delta').val());
+                        graphTimeChangeHandler(lastGraphTimeChangeEvent);   // Update filter = turn ON
+                    });
+                    
                 // ----- Apply Querystring parameters -----
                 // Netcoupe volId
                 if (volIdParams) {

@@ -73,6 +73,10 @@ function isTimeLineDefined() {
     return (timelineData) ? true : false;
 }
 
+function isTimestampAvailableInHeatmap() {
+    return (heatmapGeojsonData.features[0].properties.ts) ? true : false;
+}
+
 function getTrackHexColor(flightId) {
     var colorIndex = trackIds.indexOf(flightId) % 10;
     return d3.schemeCategory10[colorIndex];
@@ -291,33 +295,43 @@ function setupAltitudeChart(geojsontrack, data, flightId) {
     graph2d.on('timechange', function(e) {
         graphTimeChangeHandler(e);
     });
+}
 
-    function graphTimeChangeHandler(e) {
-        var selectedTime = moment(e.time);
-        var dataIndex = _.findIndex(timelineData, function (d) { return moment(d.x).isSameOrAfter(selectedTime); });
+function graphTimeChangeHandler(e) {
+    lastGraphTimeChangeEvent = e;   // Store last event so that we can re-apply the filters later
 
-        if (dataIndex !== -1) {
-            var targetData = timelineData[dataIndex];
-            var trackFeature = timelineGeojsonTrack.features[dataIndex];
-            var point = trackFeature.geometry.coordinates[0];
-            var point2 = trackFeature.geometry.coordinates[1];
+    var selectedTime = moment(e.time);
+    var dataIndex = _.findIndex(timelineData, function (d) { return moment(d.x).isSameOrAfter(selectedTime); });
 
-            var currentTime = selectedTime.format('HH:mm:ss');
-            var currrentAltitude = targetData.y;
+    if (dataIndex !== -1) {
+        var targetData = timelineData[dataIndex];
+        var trackFeature = timelineGeojsonTrack.features[dataIndex];
+        var point = trackFeature.geometry.coordinates[0];
+        var point2 = trackFeature.geometry.coordinates[1];
 
-            // --- Update the glider icon location
-            gliderIconPoint.features[0].geometry.coordinates = point;
-            // Bearing
-            gliderIconPoint.features[0].properties.bearing = turf.bearing(turf.point(point), turf.point(point2));
+        var currentTime = selectedTime.format('HH:mm:ss');
+        var currrentAltitude = targetData.y;
 
-            map.getSource('glider-point').setData(gliderIconPoint);
+        // --- Update the glider icon location
+        gliderIconPoint.features[0].geometry.coordinates = point;
+        // Bearing
+        gliderIconPoint.features[0].properties.bearing = turf.bearing(turf.point(point), turf.point(point2));
 
-            // --- Update time and latitude indication
-            $labelTrackTime.html(currentTime);
-            $labelTrackAltitude.html(currrentAltitude);
+        map.getSource('glider-point').setData(gliderIconPoint);
 
-            // --- Update the heatmap time filter ---
-            //filterBy(varioFilterValue, altInFilterValue, selectedTime.unix());
+        // --- Update time and latitude indication
+        $labelTrackTime.html(currentTime);
+        $labelTrackAltitude.html(currrentAltitude);
+
+        // --- Update the heatmap time filter ---
+        // Compute projected target moment = same hour but on the targetDate
+        if (isHeatmapTimeFilterOn) {
+            var epochSelectedTime = selectedTime.unix();
+            var selectedDate = selectedTime.startOf('day').unix();
+            var secondsAfterSelectedDate = epochSelectedTime - selectedDate;
+            var projectedEpoch = targetDate.unix() + secondsAfterSelectedDate;
+
+            filterBy(varioFilterValue, altInFilterValue, projectedEpoch);
         }
     }
 }

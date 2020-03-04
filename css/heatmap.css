@@ -52,3 +52,10 @@
     top: unset;
     bottom: 0;
 }
+
+
+
+.input-time-filter-tolerance.input-group-sm > .input-group-prepend > .input-group-text,
+.input-time-filter-tolerance.input-group-sm > .form-control {
+    font-size: 12px;
+}

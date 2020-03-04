@@ -15,25 +15,30 @@ gliderIconPoint = {
     ]
 };
 
-
-function filterBy(vario, altitude, timestamp) {
+/**
+ * filterBy
+ *
+ * Filters heatmap by various parameters
+ *
+ *
+ * @param {float}   vario                
+ * @param {int}     altitude            
+ * @param {epoch}   [projectedTimestamp] The timestamp from the timeline as if it was for the same hour of the day on the heatmap day
+ */
+function filterBy(vario, altitude, projectedTimestamp) {
     // Add updated filters
     var filters = ['all',
         ['>=', 'vario', vario],
         ['>=', 'alt_in', altitude]
     ];
 
-    if (timestamp) {
-        var timeDelta = 30 * 60;
-        var epochStart = timestamp - timeDelta;
-        var epochEnd = timestamp + timeDelta;
+    if (projectedTimestamp) {
+        var timeDelta = heatmapTimeFilterToleranceValue * 60;
+        var epochStart = projectedTimestamp - timeDelta;
+        var epochEnd = projectedTimestamp + timeDelta;
 
-        filters = ['all',
-            ['>=', 'vario', vario],
-            ['>=', 'alt_in', altitude],
-            ['>=', 'ts', epochStart],
-            ['<=', 'ts', epochEnd]
-        ];
+        filters.push(['>=', 'ts', epochStart]);
+        filters.push(['<=', 'ts', epochEnd]);
     }
 
     map.setFilter('layer-heatmap', filters);
@@ -52,123 +57,151 @@ function initHeatMap() {
     });
 
     map.on('load',
-    function () {
-        // --- Add data source ---
-        map.addSource('latest-data', {
-            type: 'geojson',
-            data: geojsonTargetDataSourceUrl
-        });
+        function () {
 
-
-        // --- Layer: Heatmap
-        map.addLayer(
-            {
-                "id": "layer-heatmap",
-                "type": "heatmap",
-                "metadata": { "mapbox:group": "e686e2df54587f748da0baac43613eb5" },
-                "source": "latest-data",
-                "layout": {
+            // Sycnhronously load Geojson data for the heatmap
+            $.ajax({
+                url: geojsonTargetDataSourceUrl,
+                type: 'GET',
+                context: document.body,
+                success: function (result) {
+                    onHeatmapDataLoaded(result);
                 },
-                "paint": {
-                    "heatmap-intensity": [
-                        "interpolate",
-                        ["linear"],
-                        ["zoom"],
-                        0,
-                        5,
-                        5,
-                        1.3
-                    ],
-                    "heatmap-radius": [
-                        "interpolate",
-                        ["linear"],
-                        ["zoom"],
-                        1,
-                        1,
-                        5,
-                        4,
-                        7,
-                        5,
-                        9,
-                        6,
-                        12,
-                        11,
-                        15,
-                        25
-                    ],
-                    "heatmap-color": [
-                        "interpolate",
-                        ["linear"],
-                        ["heatmap-density"],
-                        0,
-                        "rgba(0, 0, 255, 0)",
-                        0.1,
-                        "royalblue",
-                        0.3,
-                        "cyan",
-                        0.5,
-                        "lime",
-                        0.7,
-                        "yellow",
-                        1,
-                        "red"
-                    ],
-                    "heatmap-weight": [
-                        "case",
-                        [
-                            "<",
-                            ["get", "alt_in"],
-                            0
-                        ],
-                        0,
-                        [">", ["get", "vario"], 0],
-                        1,
-                        0
-                    ]
+                error: function (result, status, errorThrown) {
+                    console.log(errorThrown);
+                    toastr["error"]("Could not load Heatmap: " + geojsonTargetDataSourceUrl);
                 }
-            }
-
-        );
-        // End : Heatmap layer
-
-        // --- Layer: Vario values
-        map.addLayer(
-            {
-                "id": "layer-vario-value",
-                "type": "symbol",
-                "metadata": { "mapbox:group": "e686e2df54587f748da0baac43613eb5" },
-                "source": "latest-data",
-                "minzoom": 6,
-                "filter": [">", ["get", "vario"], 1],
-                "layout": {
-                    "text-justify": "auto",
-                    "text-size": 13,
-                    "text-offset": [0, 1],
-                    "text-field": [
-                        "step",
-                        ["zoom"],
-                        "",
-                        8,
-                        ["to-string", ["get", "vario"]]
-                    ]
-                },
-                "paint": {}
-            }
-        );
-        // End: Vario values
-
-
-        filterBy(varioFilterValue, altInFilterValue);
-
-
-        $('#slider, #slider-altitude-in').on('input',
-            function (e) {
-                var $varioSlider = $('#slider')[0];
-                var $altitudeSlider = $('#slider-altitude-in')[0];
-
-                varioFilterValue = parseFloat($varioSlider.value, 2);
-                altInFilterValue = parseInt($altitudeSlider.value);
-                filterBy(varioFilterValue, altInFilterValue);
             });
+        });
+}
+
+function onHeatmapDataLoaded(result) {
+    heatmapGeojsonData = result;
+    configureHeatmap();             // Configure heatmap
+    // --- Enable / Disable corresponding features ---
+    if (isTimestampAvailableInHeatmap()) {
+        // Enable heatmap filter on time
+        $('.feature-heatmap-time-filter').removeClass('d-none');
+    } else {
+        // Disable heatmap filter on time
+        $('.feature-heatmap-time-filter').addClass('d-none');
+    }
+}
+
+function configureHeatmap() {
+    // --- Add data source ---
+    map.addSource('latest-data', {
+        type: 'geojson',
+        data: heatmapGeojsonData
     });
+
+
+    // --- Layer: Heatmap
+    map.addLayer(
+        {
+            "id": "layer-heatmap",
+            "type": "heatmap",
+            "metadata": { "mapbox:group": "e686e2df54587f748da0baac43613eb5" },
+            "source": "latest-data",
+            "layout": {
+            },
+            "paint": {
+                "heatmap-intensity": [
+                    "interpolate",
+                    ["linear"],
+                    ["zoom"],
+                    0,
+                    5,
+                    5,
+                    1.3
+                ],
+                "heatmap-radius": [
+                    "interpolate",
+                    ["linear"],
+                    ["zoom"],
+                    1,
+                    1,
+                    5,
+                    4,
+                    7,
+                    5,
+                    9,
+                    6,
+                    12,
+                    11,
+                    15,
+                    25
+                ],
+                "heatmap-color": [
+                    "interpolate",
+                    ["linear"],
+                    ["heatmap-density"],
+                    0,
+                    "rgba(0, 0, 255, 0)",
+                    0.1,
+                    "royalblue",
+                    0.3,
+                    "cyan",
+                    0.5,
+                    "lime",
+                    0.7,
+                    "yellow",
+                    1,
+                    "red"
+                ],
+                "heatmap-weight": [
+                    "case",
+                    [
+                        "<",
+                        ["get", "alt_in"],
+                        0
+                    ],
+                    0,
+                    [">", ["get", "vario"], 0],
+                    1,
+                    0
+                ]
+            }
+        }
+
+    );
+    // End : Heatmap layer
+
+    // --- Layer: Vario values
+    map.addLayer(
+        {
+            "id": "layer-vario-value",
+            "type": "symbol",
+            "metadata": { "mapbox:group": "e686e2df54587f748da0baac43613eb5" },
+            "source": "latest-data",
+            "minzoom": 6,
+            "filter": [">", ["get", "vario"], 1],
+            "layout": {
+                "text-justify": "auto",
+                "text-size": 13,
+                "text-offset": [0, 1],
+                "text-field": [
+                    "step",
+                    ["zoom"],
+                    "",
+                    8,
+                    ["to-string", ["get", "vario"]]
+                ]
+            },
+            "paint": {}
+        }
+    );
+    // End: Vario values
+
+    filterBy(varioFilterValue, altInFilterValue);
+
+    $('#slider, #slider-altitude-in').on('input',
+        function (e) {
+            var $varioSlider = $('#slider')[0];
+            var $altitudeSlider = $('#slider-altitude-in')[0];
+
+            varioFilterValue = parseFloat($varioSlider.value, 2);
+            altInFilterValue = parseInt($altitudeSlider.value);
+            filterBy(varioFilterValue, altInFilterValue);
+        });
 }
