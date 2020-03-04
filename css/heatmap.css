@@ -53,9 +53,19 @@
     bottom: 0;
 }
 
+.harmonize-line{  
+    padding:5px 0;
+    justify-content: space-between;
+    align-items: center;
+}
 
+#div-time-filter-tolerance{
+    max-width: 150px;
+}
 
 .input-time-filter-tolerance.input-group-sm > .input-group-prepend > .input-group-text,
 .input-time-filter-tolerance.input-group-sm > .form-control {
-    font-size: 12px;
+    font-size: 13px;
+    padding : 0px 5px;
 }
+
