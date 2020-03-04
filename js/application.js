@@ -218,7 +218,16 @@ function addTrackToMap(geojsontrack, flightId) {
         timelineGeojsonTrack = geojsontrack;
         addTrackToTimeline(geojsontrack, flightId);
     }
-   
+
+    // Check if the added track is on the same date as the heatmap
+    var trackDate = moment.unix(geojsontrack.features[0].properties.ts).startOf('day');
+    var isTrackOnTargetDate = targetDate.isSame(trackDate);
+    if (!isTrackOnTargetDate) {
+        var _targetDate = targetDate.format("DD/MM/YYYY");
+        var _trackDate = trackDate.format("DD/MM/YYYY");
+        toastr["warning"](_targetDate + " | " + _trackDate, "Dates heatmap | vol différentes", { closeButton: true, timeOut: 10000 });
+    }
+
 }
 
 // ----------------------------------------------------- Glider Timeline -----------------------------------------------------

@@ -16,7 +16,6 @@
     <link rel="stylesheet" href="css/mapbox.css">
     <link rel="stylesheet" href="css/heatmap.css">
 
-
     <script src="https://api.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.js"></script>
     <link href="https://api.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.css" rel="stylesheet" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
@@ -171,7 +170,6 @@
                             <input type="number" class="form-control" aria-describedby="basic-addon1" id="time-delta" min="15" max="600" value="30" />
                         </div>
                     </div>
-                  
 
                 </div>
                 <div class="row">
@@ -201,8 +199,9 @@
             var trackIds = [];              // List of Netcoupe volId currently
 
             var map;
-            var timelineData;
+            var timelineData;               // The timeline graph data derived from the timelineGeojsonTrack
             var timelineGeojsonTrack;       // The interactive track data
+
             var gliderIconPoint;
             var lastGraphTimeChangeEvent;
 

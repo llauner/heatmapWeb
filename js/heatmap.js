@@ -81,10 +81,10 @@ function onHeatmapDataLoaded(result) {
     // --- Enable / Disable corresponding features ---
     if (isTimestampAvailableInHeatmap()) {
         // Enable heatmap filter on time
-        $('.feature-heatmap-time-filter').removeClass('d-none');
+        $('#feature-heatmap-time-filter').removeClass('d-none');
     } else {
         // Disable heatmap filter on time
-        $('.feature-heatmap-time-filter').addClass('d-none');
+        $('#feature-heatmap-time-filter').addClass('d-none');
     }
 }
 
