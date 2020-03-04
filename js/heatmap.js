@@ -64,8 +64,11 @@ function initHeatMap() {
                 url: geojsonTargetDataSourceUrl,
                 type: 'GET',
                 context: document.body,
+                dataType: "json",
                 success: function (result) {
-                    result = JSON.parse(result);
+                    if (typeof(result) !== 'object') {
+                        result = JSON.parse(result);
+                    }
                     onHeatmapDataLoaded(result);
                 },
                 error: function (result, status, errorThrown) {
