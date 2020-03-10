@@ -1,4 +1,6 @@
-﻿function setupAirspace() {
+﻿var isAirspaceLayerCreated = false;
+
+function setupAirspace() {
 
     var airspaceUrl = HeatmapRestAPIEndpoint + "/airspace/geojson";
     $.ajax({
@@ -20,11 +22,14 @@
 }
 
 function configureAirspace(airspaceGeojson) {
-    map.addSource('airspace', {
-        type: 'geojson',
-        data: airspaceGeojson
-    });
+    map.addSource('airspace',
+        {
+            type: 'geojson',
+            data: airspaceGeojson
+        });
+}
 
+function createAirspaceLayer() {
     // --- Layer: Airspace
     map.addLayer(
         {
@@ -100,4 +105,21 @@ function configureAirspace(airspaceGeojson) {
             }
         }
     );
+    isAirspaceLayerCreated = true;
+}
+
+function showHideAirspace(visible) {
+    // -- Show
+    if (visible && !isAirspaceLayerCreated) {
+        createAirspaceLayer();
+    }
+    else if (visible) {
+        map.setLayoutProperty("layer-airspace", 'visibility', 'visible');
+        map.setLayoutProperty("layer-airspace-label", 'visibility', 'visible');
+    }
+    // --- Hide
+    else if (!visible) {
+        map.setLayoutProperty("layer-airspace", 'visibility', 'none');
+        map.setLayoutProperty("layer-airspace-label", 'visibility', 'none');
+    }
 }

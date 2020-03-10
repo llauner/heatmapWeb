@@ -174,9 +174,18 @@
                     <h6 class="font-weight-bold">Layers</h6>
                     <img src="images/left.png" alt="Boxing down" class="left-arrow" />
                 </div>
+                
+                <!-- Airspace toggle button -->
+                <div class="row" id="switch-airspace-container">
+                    <div class="col-sm-12">
+                        <div class="custom-control custom-switch">
+                            <input type="checkbox" class="custom-control-input d-none" id="switch-airspace">
+                            <label class="custom-control-label" for="switch-airspace">Espace Aérien</label>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-
     </div>
 
     <!-- -------- Flight timeline --------- -->    
@@ -232,6 +241,8 @@
         var heatmapTimeFilterToleranceValue = 30;
         var isHeatmapTimeFilterOn = false;
 
+        var isAirspaceShown = false;
+
 
         var trackIds = [];              // List of Netcoupe volId currently
 
@@ -243,7 +254,7 @@
         var gliderIconPoint;
         var lastGraphTimeChangeEvent;
                
-        //setupAirspace();        // Setup the airspace
+        setupAirspace();        // Setup the airspace
 
         // ----- Load heatmap -----
         $.ajax({
@@ -424,6 +435,15 @@
                     heatmapTimeFilterToleranceValue = parseInt($('#time-delta').val());
                     graphTimeChangeHandler(lastGraphTimeChangeEvent);   // Update filter = turn ON
                 });
+
+            // --- Show / hide airspace ---
+            $('#switch-airspace').on('change',
+                function () {
+                    var show = $('#switch-airspace').is(':checked');
+                    isAirspaceShown = show;
+                    showHideAirspace(isAirspaceShown);
+                });
+
 
             // ----- Apply Querystring parameters -----
             // Netcoupe volId
