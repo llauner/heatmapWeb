@@ -31,6 +31,7 @@
     <script src="js/vis/vis.min.js"></script>
     <script src="js/heatmap.js"></script>
     <script src="js/application.js"></script>
+    <script src="js/airspace.js"></script>
 </head>
 <body>
     <div id="map"></div>
@@ -247,6 +248,7 @@
                 initHeatMap();          
 
                 setupDropZone();        // Setup the dropzone upload
+                //setupAirspace();        // Setup the airspace
 
                 // ----- Load heatmap -----
                 $.ajax({

@@ -71,6 +71,7 @@
     <Content Include="css\mapbox.css" />
     <Content Include="favicon.ico" />
     <Content Include="index.html" />
+    <Content Include="js\airspace.js" />
     <Content Include="js\heatmap.js" />
     <Content Include="js\application.js" />
     <Content Include="js\vis\vis.css" />
