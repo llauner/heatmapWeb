@@ -1,5 +1,6 @@
 ﻿.container {
     padding-left: 0px;
+    padding-right: 0px;
 }
 .thick {
     font-weight: bold;
@@ -29,6 +30,17 @@
     pointer-events: none;
 }
 
+.element {
+    padding-top: 10px;
+}
+
+/* Date */
+.fa-backward,
+.fa-forward {
+    padding-top: 2px;
+}
+
+/* Flight */
 .dropzone {
     background: white;
     padding: 0;
@@ -48,15 +60,17 @@
     line-height: 1;
 } 
 
+/* Timeline */
 .bottom {
     top: unset;
     bottom: 0;
 }
 
 .harmonize-line{  
-    padding:5px 0;
+    padding: 5px 0;
     justify-content: space-between;
     align-items: center;
+    margin-right:5px;
 }
 
 #div-time-filter-tolerance{
@@ -69,3 +83,62 @@
     padding : 0px 5px;
 }
 
+/* Circle buttons */
+button.circle-button{
+    background-color: white;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    text-align: center;
+}
+
+button.circle-button img{
+    display: inline-block;
+    width: 20px;
+}
+
+/* Reducing and closing buttons */
+.left-arrow,
+.up-arrow,
+.down-arrow,
+.cross{
+    width: 12px;
+    height: 12px;
+    opacity: 0.5;
+}
+
+.left-arrow:hover,
+.up-arrow:hover,
+.down-arrow:hover,
+.cross:hover {
+    opacity: 1;
+    transition: 200ms;
+}
+
+.up-arrow{
+    transform: rotate(90deg);
+}
+
+.down-arrow{
+    transform: rotate(270deg);
+} 
+
+.one-line {
+    display: flex;
+    justify-content: space-between;
+}
+
+.commands{
+    position: absolute;
+    top: -7px;
+    right: 10px;
+    padding: 3px;
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    border-radius: 2px;
+}
+
+.commands .cross{
+    margin-bottom: 5px;
+}
