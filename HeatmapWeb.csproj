@@ -70,10 +70,17 @@
     <Content Include="css\heatmap.css" />
     <Content Include="css\mapbox.css" />
     <Content Include="favicon.ico" />
+    <Content Include="images\customisation.png" />
+    <Content Include="images\delete.png" />
+    <Content Include="images\graph.png" />
+    <Content Include="images\layers.png" />
+    <Content Include="images\left.png" />
+    <Content Include="images\plane.png" />
     <Content Include="index.html" />
     <Content Include="js\airspace.js" />
     <Content Include="js\heatmap.js" />
     <Content Include="js\application.js" />
+    <Content Include="js\interface.js" />
     <Content Include="js\vis\vis.css" />
     <Content Include="js\vis\vis.js" />
     <Content Include="js\vis\vis.min.css" />
