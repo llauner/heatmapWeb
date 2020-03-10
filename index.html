@@ -242,50 +242,51 @@
 
         var gliderIconPoint;
         var lastGraphTimeChangeEvent;
-                setupDropZone();        // Setup the dropzone upload
-                //setupAirspace();        // Setup the airspace
+               
+        //setupAirspace();        // Setup the airspace
 
-                // ----- Load heatmap -----
-                $.ajax({
-                    url: metadataJsonSourceUrl,
-                    type: 'GET',
-                    context: document.body,
-                    success: function (result) {
-                        // Get result metadata
-                        metadata = result;
-                        targetDate = moment(metadata.targetDate, "YYYY_MM_DD");
-                        startDate = moment(metadata.startDate, "YYYY_MM_DD HH:mm:ss");
+        // ----- Load heatmap -----
+        $.ajax({
+            url: metadataJsonSourceUrl,
+            type: 'GET',
+            context: document.body,
+            success: function(result) {
+                // Get result metadata
+                metadata = result;
+                targetDate = moment(metadata.targetDate, "YYYY_MM_DD");
+                startDate = moment(metadata.startDate, "YYYY_MM_DD HH:mm:ss");
 
-                        targetDateToDisplay = targetDate.format("DD/MM/YYYY");
-                        startDateToDisplay = moment(startDate).format("DD/MM/YYYY HH:mm:ss");
-                        duration = metadata.duration;
-                        flightsCount = metadata.flightsCount;
-                        thermalsCount = metadata.thermalsCount;
+                targetDateToDisplay = targetDate.format("DD/MM/YYYY");
+                startDateToDisplay = moment(startDate).format("DD/MM/YYYY HH:mm:ss");
+                duration = metadata.duration;
+                flightsCount = metadata.flightsCount;
+                thermalsCount = metadata.thermalsCount;
 
-                        // --- Init interface ---
-                        // --- Populate information panel
-                        $('#target-date').html(targetDateToDisplay);
-                        $('#start-date').html(startDateToDisplay);
-                        $('#duration').html(duration);
-                        $('#flights-count').html(flightsCount);
-                        $('#thermals-count').html(thermalsCount);
+                // --- Init interface ---
+                // --- Populate information panel
+                $('#target-date').html(targetDateToDisplay);
+                $('#start-date').html(startDateToDisplay);
+                $('#duration').html(duration);
+                $('#flights-count').html(flightsCount);
+                $('#thermals-count').html(thermalsCount);
 
-                        // --- Show / hide buttons
-                        var isFlightSameDayAsRun = moment(targetDate).isSame(startDate, 'day');
-                        var isTodayTargetDay = moment().diff(targetDate, 'days') === 0;
+                // --- Show / hide buttons
+                var isFlightSameDayAsRun = moment(targetDate).isSame(startDate, 'day');
+                var isTodayTargetDay = moment().diff(targetDate, 'days') === 0;
 
-                        var deltaDays = startDate.diff(targetDate, 'days');
-                        var deltaDaysNow = moment().diff(targetDate, 'days');
-                        var isLatestAvailable = deltaDays === 1 && deltaDaysNow === 1;
+                var deltaDays = startDate.diff(targetDate, 'days');
+                var deltaDaysNow = moment().diff(targetDate, 'days');
+                var isLatestAvailable = deltaDays === 1 && deltaDaysNow === 1;
 
-                        if ((isFlightSameDayAsRun && isTodayTargetDay) || isLatestAvailable) {
-                            $('#btn-day-forward').addClass('disabled-button');
-                        }
-                        else {
-                            $('#btn-day-forward').removeClass('disabled-button');
-                        }
+                if ((isFlightSameDayAsRun && isTodayTargetDay) || isLatestAvailable) {
+                    $('#btn-day-forward').addClass('disabled-button');
+                } else {
+                    $('#btn-day-forward').removeClass('disabled-button');
+                }
+            }
+        });
 
-        var $labelTrackTime;
+                    var $labelTrackTime;
         var $labelTrackAltitude;
 
         // Parse querystring parameters to extract desired day
