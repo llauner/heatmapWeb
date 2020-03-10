@@ -44,12 +44,16 @@
         $(this).addClass('d-none');
     });
 
-    $('#commands img.left-arrow').on('click', function () {
-        $('#flight-timeline .map-overlay-inner').addClass('d-none');
-        $('#timeline-button').removeClass('d-none');
-    })
+    $('#commands img.left-arrow').on('click',
+        function() {
+            $('#flight-timeline .map-overlay-inner').addClass('d-none');
+            $('#timeline-button').removeClass('d-none');
+        });
 
-    $('#commands img.cross').on('click', function () {
-        $('#flight-timeline').addClass('d-none');
-    })  
+    // Destroy the timeline
+    $('#commands img.cross').on('click',
+        function() {
+            $('#flight-timeline').addClass('d-none');
+            deleteIconAndTimeline();
+        });
 }); 

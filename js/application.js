@@ -136,6 +136,7 @@ function setupDropZone() {
 }
 
 // ---------- Setupd and configure glider icon on map ---------
+var isGliderIconLoaded = false;
 function setupGliderIconOnTrack(originLocation, flightId) {
     // A single point that animates along the route.
     // Coordinates are initially set to origin.
@@ -151,11 +152,15 @@ function setupGliderIconOnTrack(originLocation, flightId) {
     map.loadImage("/images/glider.png",
         function(error0, image0) {
             if (error0) throw error0;
-            map.addImage("image",
-                image0,
-                {
-                    "sdf": "true"
-                });
+
+            if (!isGliderIconLoaded) {
+                map.addImage("image",
+                    image0,
+                    {
+                        "sdf": "true"
+                    });
+                isGliderIconLoaded = true;
+            }
 
             map.addLayer({
                 "id": "layer-glider-point",
@@ -283,10 +288,10 @@ function setupAltitudeChart(geojsontrack, data, flightId) {
         }
 
     };
-    var graph2d = new vis.Graph2d(container, dataset, options);
+    timelineVisGraph2d = new vis.Graph2d(container, dataset, options);
 
     // Add Custom vertical line
-    graph2d.addCustomTime(data[0].x);
+    timelineVisGraph2d.addCustomTime(data[0].x);
 
     // Add Glider icon on track
     var trackFeature = geojsontrack.features[0];
@@ -301,7 +306,7 @@ function setupAltitudeChart(geojsontrack, data, flightId) {
     $('.vis-graph-group0').css('stroke', hexTrackColor);
 
     // --- Event: timechange ---
-    graph2d.on('timechange', function(e) {
+    timelineVisGraph2d.on('timechange', function(e) {
         graphTimeChangeHandler(e);
     });
 }
@@ -343,4 +348,21 @@ function graphTimeChangeHandler(e) {
             filterBy(varioFilterValue, altInFilterValue, projectedEpoch);
         }
     }
+}
+
+// ---------- Delete glider icon and altitude chart ----------
+function deleteIconAndTimeline() {
+
+    // Destroy timeline
+    timelineGeojsonTrack = null;
+    timelineData = null;
+
+    timelineVisGraph2d.destroy();       // Destroy the graph2d
+
+    // Destroy glider icon
+    map.removeLayer('layer-glider-point');
+    map.removeSource('glider-point');
+
+    // Show switch as it's now usefull
+    $('#switch-navigator-container').removeClass('d-none');
 }
