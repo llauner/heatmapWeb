@@ -77,6 +77,7 @@
     <Content Include="images\left.png" />
     <Content Include="images\plane.png" />
     <Content Include="index.html" />
+    <Content Include="js\airspace.js" />
     <Content Include="js\heatmap.js" />
     <Content Include="js\application.js" />
     <Content Include="js\interface.js" />
