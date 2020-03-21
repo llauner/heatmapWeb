@@ -264,7 +264,7 @@
 
         var isAirspaceShown = false;
         var isAuthenticated = false;
-
+        var xApiKey = null;
 
         var trackIds = [];              // List of Netcoupe volId currently
 
@@ -323,6 +323,7 @@
         var $labelTrackTime;
         var $labelTrackAltitude;
 
+        // --- Query string parameters ---
         // Parse querystring parameters to extract desired day
         // Expected date format = yyyy_mm_dd example: 2020_02_05
         var queryString = window.location.search;
@@ -333,7 +334,7 @@
             var urlParams = new URLSearchParams(queryString);
             targetDayParam = urlParams.get('day');
             volIdParams = urlParams.get('volId');
-            apiKey = urlParams.get('x-api-key');
+            apiKey = getXApiKeyformUrlParams(urlParams);
 
             if (volIdParams) {
                 volIdParams = $.map(volIdParams.split(","), $.trim);
@@ -458,7 +459,7 @@
             if (volIdParams) {
                 volIdParams.forEach(e => {
                     if (parseInt(e)) {
-                        loadNetcoupeFlight(e); // Load flight
+                        loadFlight(e); // Load flight
                     }
                 });
             }
@@ -473,7 +474,7 @@
         }
 
         // --- Load the Flight from the Netcoupe ---
-        function loadNetcoupeFlight(flightId, geojsontrack) {
+        function loadFlight(flightId, geojsontrack) {
 
             // Check that the flight is not already there
             // Check already done if the flight was uploaded from an igc file

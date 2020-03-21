@@ -109,7 +109,7 @@ function setupDropZone() {
     myDropzone.on("success", function (file, response) {
         myDropzone.removeAllFiles();
         trackId = file.name;
-        loadNetcoupeFlight(trackId, response);
+        loadFlight(trackId, response);
     });
 
     myDropzone.on("error", function (file, errorMessage, xhrResponse) {

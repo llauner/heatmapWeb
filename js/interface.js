@@ -1,11 +1,11 @@
 ﻿$(function () {
     // ----- Event handlers -----
-    // --- Flight
+    // --- Netcoupe Flight
     $('#btn-get-flight').on('click',
         function () {
             flightId = $('#lbl-flight-id').val();
             console.log("Loading Netcoupe flight#" + flightId);
-            loadNetcoupeFlight(flightId);
+            loadFlight(flightId);
         });
     // --- Day + 1
     $('#btn-day-forward').on('click',

@@ -15,6 +15,7 @@ function checkAuthentication(apiKey) {
 			toastr["success"]("Extra features enabled !", "Authentication OK");
 			// Authentication successful
 			isAuthenticated = true;
+			xApiKey = apiKey;
 			enableExtraFeatures();
 		},
 		error: function(jqXHR, textStatus, errorThrown ) {
@@ -29,5 +30,15 @@ function enableExtraFeatures() {
 	$(function () {
 		$('#xtra-features-container').removeClass('d-none');	// Show panel
 	});
-	
+}
+
+function getXApiKeyformUrlParams(urlParams) {
+	acceptedXApiKeyParams = ['x-api-key', 'apikey', 'key', 'auth', 'password']
+
+	apiKey = null;
+	for (let key of acceptedXApiKeyParams) {
+		apiKey = urlParams.get(key);
+		if (apiKey) break;
+	}
+	return apiKey;
 }
