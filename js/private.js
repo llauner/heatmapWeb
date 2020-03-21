@@ -1,4 +1,5 @@
 var authenticationUrl = HeatmapRestAPIEndpoint + "/auth";
+var airspaceForFileUrl = HeatmapRestAPIEndpoint + "/airspace/file/igc";
 
 function checkAuthentication(apiKey) {
 	jsonApiKey = {x_api_key: apiKey}
@@ -22,6 +23,31 @@ function checkAuthentication(apiKey) {
 			console.log("Authentication error. Reponse=");
 			console.log(jqXHR);
 			toastr["error"](jqXHR.responseText, "Authentication failed !");
+		}
+	});
+}
+
+function getAirspaceForFile(file) {
+	// Create a new formData and append the dropzone file
+	var secondRequestContent = new FormData();
+	secondRequestContent.append('file', file);
+	// Subnit second request
+	$.ajax({
+		url: airspaceForFileUrl,
+		type: 'POST',
+		data: secondRequestContent,
+		enctype: 'multipart/form-data',
+		processData: false,
+        contentType: false,
+		headers: {
+			'x-api-key':xApiKey
+		},
+		success: function(result) {
+			console.log(result);
+		},
+		error: function(jqXHR, textStatus, errorThrown ) {
+			toastr["error"](jqXHR.responseText, "Getting airspace for file failed !");
+			console.log(jqXHR);
 		}
 	});
 }

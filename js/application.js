@@ -110,6 +110,8 @@ function setupDropZone() {
         myDropzone.removeAllFiles();
         trackId = file.name;
         loadFlight(trackId, response);
+
+        getAirspaceForFile(file);
     });
 
     myDropzone.on("error", function (file, errorMessage, xhrResponse) {
@@ -131,9 +133,11 @@ function setupDropZone() {
         if (!checkFlightCanBeAdded(flightId)) {
             myDropzone.removeAllFiles();
         }
-
     });
+
 }
+
+
 
 // ---------- Setupd and configure glider icon on map ---------
 var isGliderIconLoaded = false;
