@@ -1,4 +1,24 @@
 ﻿$(function () {
+    // ----- Event handlers -----
+    // --- Flight
+    $('#btn-get-flight').on('click',
+        function () {
+            flightId = $('#lbl-flight-id').val();
+            console.log("Loading Netcoupe flight#" + flightId);
+            loadNetcoupeFlight(flightId);
+        });
+    // --- Day + 1
+    $('#btn-day-forward').on('click',
+        function () {
+            reloadPage(1);
+        });
+    // --- Day + -1
+    $('#btn-day-backward').on('click',
+        function () {
+            reloadPage(-1);
+        });
+
+    // ----- Button and panels interface = pure UI -----
     // Date 
     $('#up-down-arrow').on('click', function () {
         $('#reducible').toggleClass('d-none');
@@ -36,6 +56,17 @@
     $('#layers-container img.left-arrow').on('click', function () {
         $('#layers-container').addClass('d-none');
         $('#layers-button').removeClass('d-none');
+    });
+
+    // Extra Features
+    $('#xtra-features-button').on('click', function () {
+        $('#xtra-features-container').removeClass('d-none');
+        $(this).addClass('d-none');
+    });
+
+    $('#xtra-features-container img.left-arrow').on('click', function () {
+        $('#xtra-features-container').addClass('d-none');
+        $('#xtra-features-button').removeClass('d-none');
     });
     
     // Timeline
