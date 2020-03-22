@@ -142,3 +142,10 @@ button.circle-button img{
 .commands .cross{
     margin-bottom: 5px;
 }
+
+.spinner-container {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

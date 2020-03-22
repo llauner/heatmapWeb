@@ -1,5 +1,6 @@
 var authenticationUrl = HeatmapRestAPIEndpoint + "/auth";
 var airspaceForFileUrl = HeatmapRestAPIEndpoint + "/airspace/file/igc";
+var airspaceForNetcoupeFlightUrl = HeatmapRestAPIEndpoint + "/airspace/netcoupe/";
 
 function checkAuthentication(apiKey) {
 	jsonApiKey = {x_api_key: apiKey}
@@ -32,6 +33,7 @@ function getAirspaceForFile(file) {
 	var secondRequestContent = new FormData();
 	secondRequestContent.append('file', file);
 	// Subnit second request
+	$('#airspace-spinner').removeClass('d-none');	// Show spinner
 	$.ajax({
 		url: airspaceForFileUrl,
 		type: 'POST',
@@ -43,14 +45,60 @@ function getAirspaceForFile(file) {
 			'x-api-key':xApiKey
 		},
 		success: function(result) {
-			console.log(result);
+			showInfringedAirspace(result);
 		},
 		error: function(jqXHR, textStatus, errorThrown ) {
 			toastr["error"](jqXHR.responseText, "Getting airspace for file failed !");
 			console.log(jqXHR);
+		},
+		complete: function( ataOrjqXHR, textStatus,jqXHROrerrorThrown ) {
+			$('#airspace-spinner').addClass('d-none');	// Hide spinner
 		}
 	});
 }
+
+function getAirspaceForNetcoupeFlight(netcoupeFlightId) {
+	airspaceForNetcoupeFlightUrl = airspaceForNetcoupeFlightUrl + netcoupeFlightId;
+	// Subnit second request
+	$('#airspace-spinner').removeClass('d-none');	// Show spinner
+	$.ajax({
+		url: airspaceForNetcoupeFlightUrl,
+		type: 'GET',
+		accept: "application/json",
+		headers: {
+			'x-api-key':xApiKey
+		},
+		success: function(result) {
+			showInfringedAirspace(result);
+		},
+		error: function(jqXHR, textStatus, errorThrown ) {
+			toastr["error"](jqXHR.responseText, "Getting airspace for Netcoupe flight failed. Id=" + netcoupeFlightId);
+			console.log(jqXHR);
+		},
+		complete: function( ataOrjqXHR, textStatus,jqXHROrerrorThrown ) {
+			$('#airspace-spinner').addClass('d-none');	// Hide spinner
+		}
+	});
+}
+
+function showInfringedAirspace(infringedAirspaceGeojson) {
+	// Add map source
+	map.addSource('infringed-airspace',
+        {
+            type: 'geojson',
+            data: infringedAirspaceGeojson
+		});
+	// --- Add layers ---
+	// Infringed airspace
+	map.addLayer(INFRINGED_AIRSPACE_LAYER_DEFINITION);
+
+	// Infringed airspace labels
+	var infringedAirspaceLabelLayerDefinition = {};
+	Object.assign(infringedAirspaceLabelLayerDefinition, AIRSPACE_LABEL_LAYER_DEFINITION);
+	infringedAirspaceLabelLayerDefinition.id = "layer-infringed-airspace-label";
+	infringedAirspaceLabelLayerDefinition.source = "infringed-airspace";
+    map.addLayer(infringedAirspaceLabelLayerDefinition);
+};
 
 function enableExtraFeatures() {
 	$(function () {

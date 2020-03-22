@@ -201,7 +201,7 @@
                 <!-- Airspace infringement toggle button -->
                 <div class="row" id="xtra-features-container">
                     <div class="col-sm-2">
-                        <input class="form-check-input" type="checkbox" value="" id="defaultCheck1">
+                        <input class="form-check-input" type="checkbox" value="" id="chk-show-infringed-only">
                     </div>
                     <div class="col-sm-10">
                             <label class="form-check-label" for="defaultCheck1">Show infringed Airspace only</label>
@@ -251,6 +251,12 @@
         </div>
     </div>
 
+    <div class="container spinner-container d-none" id="airspace-spinner">
+        <button class="btn btn-primary" type="button" disabled>
+            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            <span class="">Loading Airspace ...</span>
+        </button>
+    </div>
     <script>
         
 
@@ -265,6 +271,7 @@
         var isAirspaceShown = false;
         var isAuthenticated = false;
         var xApiKey = null;
+        var isShowInfringedAirspaceOnly = false;
 
         var trackIds = [];              // List of Netcoupe volId currently
 
@@ -445,15 +452,6 @@
                     graphTimeChangeHandler(lastGraphTimeChangeEvent);   // Update filter = turn ON
                 });
 
-            // --- Show / hide airspace ---
-            $('#switch-airspace').on('change',
-                function () {
-                    var show = $('#switch-airspace').is(':checked');
-                    isAirspaceShown = show;
-                    showHideAirspace(isAirspaceShown);
-                });
-
-
             // ----- Apply Querystring parameters -----
             // Netcoupe volId
             if (volIdParams) {
@@ -505,6 +503,7 @@
 
                     }
                 });
+                if (isShowInfringedAirspaceOnly) getAirspaceForNetcoupeFlight(flightId);
             } else {
                 addTrackToMap(geojsontrack, flightId);
             }

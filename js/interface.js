@@ -17,6 +17,31 @@
         function () {
             reloadPage(-1);
         });
+    // --- Show / hide airspace ---
+    $('#switch-airspace').on('change',
+    function () {
+        var show = $('#switch-airspace').is(':checked');
+        isAirspaceShown = show;
+        showHideAirspace(isAirspaceShown);
+    });
+
+    // --- Extra features: show infringed airspace only ---
+    $('#chk-show-infringed-only').on('change', function () {
+        var isChecked = $('#chk-show-infringed-only').is(':checked');
+        // Show infringed airspace only
+        if (isChecked) {
+            $('#switch-airspace').prop( "checked", false ); // Uncheck show airspace
+            $('#switch-airspace').trigger('change');
+
+            $('#switch-navigator').prop('checked', true);
+
+            isShowInfringedAirspaceOnly = true;
+        }
+        else {
+            isShowInfringedAirspaceOnly = false;
+        }
+    });
+
 
     // ----- Button and panels interface = pure UI -----
     // Date 

@@ -110,8 +110,8 @@ function setupDropZone() {
         myDropzone.removeAllFiles();
         trackId = file.name;
         loadFlight(trackId, response);
-
-        getAirspaceForFile(file);
+        
+        if (isShowInfringedAirspaceOnly) getAirspaceForFile(file);
     });
 
     myDropzone.on("error", function (file, errorMessage, xhrResponse) {
@@ -240,8 +240,11 @@ function addTrackToMap(geojsontrack, flightId) {
 }
 
 // ----------------------------------------------------- Glider Timeline -----------------------------------------------------
+function isShowTimelineChecked() {
+    return $('#switch-navigator').is(':checked');
+}
 function addTrackToTimeline(geojsontrack, flightId) {
-    var isShowTimeline = $('#switch-navigator').is(':checked');
+    var isShowTimeline = isShowTimelineChecked();
 
     if (isShowTimeline) {
         var data = _.map(geojsontrack.features,
