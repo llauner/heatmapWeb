@@ -1,5 +1,13 @@
 ﻿mapboxgl.accessToken = 'pk.eyJ1IjoibHVkb3ZpY2xhdW5lciIsImEiOiJjazVtNzdvYzkwdTMzM2txa2xvaXJ0ZnY3In0.G6nft9RJo94MHqOOmIaYwA';
 
+// Check if the Mapbox-GL style is loaded.
+function checkIfMapboxStyleIsLoaded() {
+    if (map.isStyleLoaded()) {
+      return true; // When it is safe to manipulate layers
+    } else {
+      return false; // When it is not safe to manipulate layers
+    }
+  };
 
 gliderIconPoint = {
     'type': 'FeatureCollection',

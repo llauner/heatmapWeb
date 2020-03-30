@@ -93,7 +93,7 @@ function setupAirspace() {
             if (typeof (result) !== 'object') {
                 result = JSON.parse(result);
             }
-            configureAirspace(result);
+            configureAirspace(result);    
         },
         error: function(result, status, errorThrown) {
             console.log(errorThrown);
@@ -102,7 +102,18 @@ function setupAirspace() {
     });
 }
 
+
 function configureAirspace(airspaceGeojson) {
+    var check = checkIfMapboxStyleIsLoaded();
+    if (!check) {
+      // It's not safe to manipulate layers yet, so wait 200ms and then check again
+      setTimeout(function() {
+        configureAirspace(airspaceGeojson);
+      }, 200);
+      return;
+    }
+  
+    // Whew, now it's safe to manipulate layers!
     map.addSource('airspace',
         {
             type: 'geojson',
