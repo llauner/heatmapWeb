@@ -35,6 +35,7 @@
     <script src="js/interface.js"></script>
     <script src="js/airspace.js"></script>
     <script src="js/private.js"></script>
+    <script src="js/dayNavigation.js"></script>
 </head>
 <body>
     <div id="map"></div>
@@ -48,13 +49,13 @@
                             <div class="item">Date</div>
                         </div>
                         <div class="col-sm-2">
-                            <button type="button" class="btn fa fa-backward" id="btn-day-backward" />
+                            <button type="button" class="btn fa fa-backward disabled-button" id="btn-day-backward" />
                         </div>
                         <div class="col-sm-5">
                             <div id="target-date" class="item thick"></div>
                         </div>
                         <div class="col-sm-2">
-                            <button type="button" class="btn fa fa-forward" id="btn-day-forward" />
+                            <button type="button" class="btn fa fa-forward disabled-button" id="btn-day-forward" />
                         </div>
                     </div>
                     <img id="up-down-arrow" src="images/left.png" alt="Reduce box" class="down-arrow" />
@@ -262,7 +263,7 @@
 
         var heatmapGeojsonData;
 
-        var targetDate = null;
+        var targetDate = null; var toto=null;
         var varioFilterValue = 1;
         var altInFilterValue = 0;
         var heatmapTimeFilterToleranceValue = 30;
@@ -284,48 +285,10 @@
         var gliderIconPoint;
         var lastGraphTimeChangeEvent;
 
+        var availableMetadataDates = [];    // List of yyyy_mm_dd strings containing available yyyy_mm_dd-metadata.json files
+
         setupAirspace();        // Setup the airspace
-
-        // ----- Load heatmap -----
-        $.ajax({
-            url: metadataJsonSourceUrl,
-            type: 'GET',
-            context: document.body,
-            success: function(result) {
-                // Get result metadata
-                metadata = result;
-                targetDate = moment(metadata.targetDate, "YYYY_MM_DD");
-                startDate = moment(metadata.startDate, "YYYY_MM_DD HH:mm:ss");
-
-                targetDateToDisplay = targetDate.format("DD/MM/YYYY");
-                startDateToDisplay = moment(startDate).format("DD/MM/YYYY HH:mm:ss");
-                duration = metadata.duration;
-                flightsCount = metadata.flightsCount;
-                thermalsCount = metadata.thermalsCount;
-
-                // --- Init interface ---
-                // --- Populate information panel
-                $('#target-date').html(targetDateToDisplay);
-                $('#start-date').html(startDateToDisplay);
-                $('#duration').html(duration);
-                $('#flights-count').html(flightsCount);
-                $('#thermals-count').html(thermalsCount);
-
-                // --- Show / hide buttons
-                var isFlightSameDayAsRun = moment(targetDate).isSame(startDate, 'day');
-                var isTodayTargetDay = moment().diff(targetDate, 'days') === 0;
-
-                var deltaDays = startDate.diff(targetDate, 'days');
-                var deltaDaysNow = moment().diff(targetDate, 'days');
-                var isLatestAvailable = deltaDays === 1 && deltaDaysNow === 1;
-
-                if ((isFlightSameDayAsRun && isTodayTargetDay) || isLatestAvailable) {
-                    $('#btn-day-forward').addClass('disabled-button');
-                } else {
-                    $('#btn-day-forward').removeClass('disabled-button');
-                }
-            }
-        });
+        getFileList();          // Get list of available geojson files
 
         var $labelTrackTime;
         var $labelTrackAltitude;
@@ -359,6 +322,7 @@
         // Target day
         if (targetDayParam) {
             targetDate = moment(targetDayParam, "YYYY_MM_DD");
+            toto = targetDate;
             geojsonTargetDataSourceUrl = storageBaseUrl + targetDayParam + heatMapFileNamePrefix;
             metadataJsonSourceUrl = storageBaseUrl + targetDayParam + metaDataFileNamePrefix;
         }
@@ -376,7 +340,7 @@
 
             setupDropZone();        // Setup the dropzone upload
 
-            // ----- Load heatmap -----
+            // ----- Load MetaData -----
             $.ajax({
                 url: metadataJsonSourceUrl,
                 type: 'GET',
@@ -384,10 +348,11 @@
                 success: function (result) {
                     // Get result metadata
                     metadata = result;
-                    targetDate = moment(metadata.targetDate, "YYYY_MM_DD");
+                    metaDataTargetDate = moment(metadata.targetDate, "YYYY_MM_DD");
+                    targetDate = metaDataTargetDate;
                     startDate = moment(metadata.startDate, "YYYY_MM_DD HH:mm:ss");
 
-                    targetDateToDisplay = targetDate.format("DD/MM/YYYY");
+                    targetDateToDisplay = metaDataTargetDate.format("DD/MM/YYYY");
                     startDateToDisplay = moment(startDate).format("DD/MM/YYYY HH:mm:ss");
                     duration = metadata.duration;
                     flightsCount = metadata.flightsCount;
@@ -400,22 +365,6 @@
                     $('#duration').html(duration);
                     $('#flights-count').html(flightsCount);
                     $('#thermals-count').html(thermalsCount);
-
-                    // --- Show / hide buttons
-                    var isFlightSameDayAsRun = moment(targetDate).isSame(startDate, 'day');
-                    var isTodayTargetDay = moment().diff(targetDate, 'days') === 0;
-
-                    var deltaDays = startDate.diff(targetDate, 'days');
-                    var deltaDaysNow = moment().diff(targetDate, 'days');
-                    var isLatestAvailable = deltaDays === 1 && deltaDaysNow === 1;
-
-                    if ((isFlightSameDayAsRun && isTodayTargetDay) || isLatestAvailable) {
-                        $('#btn-day-forward').addClass('disabled-button');
-                    }
-                    else {
-                        $('#btn-day-forward').removeClass('disabled-button');
-                    }
-
                 },
                 error: function (result, status, errorThrown) {
                     console.log(errorThrown);
@@ -424,7 +373,6 @@
                     // Populate information panel
                     var targetDateToDisplay = moment(targetDate).format("DD/MM/YYYY");
                     $('#target-date').html(targetDateToDisplay);
-
                     toastr["error"]("Pas de carte disponibe pour ce jour: " + targetDateToDisplay);
                 }
             });
@@ -463,13 +411,6 @@
             }
 
         });
-
-        // Reload the page for the next / previous day
-        function reloadPage(deltaDay) {
-            newTargetDate = targetDate.add(deltaDay, 'd');
-            dayParam = newTargetDate.format("YYYY_MM_DD");
-            location.href = '?day=' + dayParam;
-        }
 
         // --- Load the Flight from the Netcoupe ---
         function loadFlight(flightId, geojsontrack) {

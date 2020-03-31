@@ -81,7 +81,7 @@ function initHeatMap() {
                 },
                 error: function (result, status, errorThrown) {
                     console.log(errorThrown);
-                    toastr["error"]("Could not load Heatmap: " + geojsonTargetDataSourceUrl);
+                    //toastr["error"]("Could not load Heatmap: " + geojsonTargetDataSourceUrl);
                 }
             });
         });
