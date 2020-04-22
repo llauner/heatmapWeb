@@ -74,7 +74,7 @@ function isTimeLineDefined() {
 }
 
 function isTimestampAvailableInHeatmap() {
-    return (heatmapGeojsonData.features[0].properties.ts) ? true : false;
+    return (heatmapGeojsonData.features.length && heatmapGeojsonData.features[0].properties.ts) ? true : false;
 }
 
 function getTrackHexColor(flightId) {

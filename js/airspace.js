@@ -83,7 +83,9 @@ var AIRSPACE_LABEL_LAYER_DEFINITION =   {
 };
 
 function setupAirspace() {
-    var airspaceUrl = HeatmapRestAPIEndpoint + "/airspace/geojson";
+    var airspaceUrl = NetcoupeAirspaceDataUrl + OpenAirGeojsonFileName;
+    var metadataUrl = NetcoupeAirspaceDataUrl + OpenAirMetadataFileName;
+
     $.ajax({
         url: airspaceUrl,
         type: 'GET',
@@ -94,6 +96,23 @@ function setupAirspace() {
                 result = JSON.parse(result);
             }
             configureAirspace(result);    
+        },
+        error: function(result, status, errorThrown) {
+            console.log(errorThrown);
+            toastr["error"]("Could not load Airspace: " + airspaceUrl);
+        }
+    });
+
+    $.ajax({
+        url: metadataUrl,
+        type: 'GET',
+        context: document.body,
+        dataType: "json",
+        success: function(result) {
+            if (typeof (result) !== 'object') {
+                result = JSON.parse(result);
+            }
+            initToolTip_Airspace(result);    
         },
         error: function(result, status, errorThrown) {
             console.log(errorThrown);

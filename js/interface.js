@@ -113,3 +113,12 @@
             deleteIconAndTimeline();
         });
 }); 
+
+function initToolTip_Airspace(metadata) {
+    var text = `Source: ${metadata.source}<br>Date: ${metadata.date}`;
+    $('[data-toggle="tooltip-airspace"]').tooltip({
+        placement: 'auto',
+        html: true,
+        title: text
+    })
+}
