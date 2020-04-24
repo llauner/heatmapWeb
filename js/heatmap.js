@@ -2,7 +2,7 @@
 
 // Check if the Mapbox-GL style is loaded.
 function checkIfMapboxStyleIsLoaded() {
-    if (map.isStyleLoaded()) {
+    if (map && map.isStyleLoaded()) {
       return true; // When it is safe to manipulate layers
     } else {
       return false; // When it is not safe to manipulate layers

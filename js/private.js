@@ -45,7 +45,8 @@ function getAirspaceForFile(file) {
 			'x-api-key':xApiKey
 		},
 		success: function(result) {
-			showInfringedAirspace(result);
+			showInfringedAirspace(result.geojsonInfringedAirspace);
+			showInfringedAirspaceMarkers(result.geojsonInfringedPoints);
 		},
 		error: function(jqXHR, textStatus, errorThrown ) {
 			toastr["error"](jqXHR.responseText, "Getting airspace for file failed !");
@@ -69,7 +70,9 @@ function getAirspaceForNetcoupeFlight(netcoupeFlightId) {
 			'x-api-key':xApiKey
 		},
 		success: function(result) {
-			showInfringedAirspace(result);
+			showInfringedAirspace(result.geojsonInfringedAirspace);
+			showInfringedAirspaceMarkers(result.geojsonInfringedPoints);
+
 		},
 		error: function(jqXHR, textStatus, errorThrown ) {
 			toastr["error"](jqXHR.responseText, "Getting airspace for Netcoupe flight failed. Id=" + netcoupeFlightId);
@@ -81,6 +84,11 @@ function getAirspaceForNetcoupeFlight(netcoupeFlightId) {
 	});
 }
 
+/**
+ * showInfringedAirspace
+ * Show the inforgined Airspaces on the map
+ * @param {*} infringedAirspaceGeojson
+ */
 function showInfringedAirspace(infringedAirspaceGeojson) {
 	// Add map source
 	map.addSource('infringed-airspace',

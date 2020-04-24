@@ -234,7 +234,7 @@ function addTrackToMap(geojsontrack, flightId) {
     if (!isTrackOnTargetDate) {
         var _targetDate = targetDate.format("DD/MM/YYYY");
         var _trackDate = trackDate.format("DD/MM/YYYY");
-        toastr["warning"](_targetDate + " | " + _trackDate, "Dates heatmap | vol différentes", { closeButton: true, timeOut: 10000 });
+        toastr["warning"](_targetDate + " | " + _trackDate, "Dates heatmap | vol différentes", { closeButton: true, timeOut: 3000 });
     }
 
 }
