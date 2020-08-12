@@ -3,24 +3,24 @@ var airspaceForFileUrl = HeatmapRestAPIEndpoint + "/airspace/file/igc";
 var airspaceForNetcoupeFlightUrl = HeatmapRestAPIEndpoint + "/airspace/netcoupe/";
 
 function checkAuthentication(apiKey) {
-	jsonApiKey = {x_api_key: apiKey}
+	jsonApiKey = { x_api_key: apiKey }
 
-	 // ----- Check authentication -----
-	 $.ajax({
+	// ----- Check authentication -----
+	$.ajax({
 		url: authenticationUrl,
 		type: 'POST',
 		context: document.body,
 		contentType: "application/json",
 		accept: "application/json",
 		data: JSON.stringify(jsonApiKey),
-		success: function(result) {
+		success: function (result) {
 			toastr["success"]("Extra features enabled !", "Authentication OK");
 			// Authentication successful
 			isAuthenticated = true;
 			xApiKey = apiKey;
 			enableExtraFeatures();
 		},
-		error: function(jqXHR, textStatus, errorThrown ) {
+		error: function (jqXHR, textStatus, errorThrown) {
 			console.log("Authentication error. Reponse=");
 			console.log(jqXHR);
 			toastr["error"](jqXHR.responseText, "Authentication failed !");
@@ -40,19 +40,19 @@ function getAirspaceForFile(file) {
 		data: secondRequestContent,
 		enctype: 'multipart/form-data',
 		processData: false,
-        contentType: false,
+		contentType: false,
 		headers: {
-			'x-api-key':xApiKey
+			'x-api-key': xApiKey
 		},
-		success: function(result) {
+		success: function (result) {
 			showInfringedAirspace(result.geojsonInfringedAirspace);
 			showInfringedAirspaceMarkers(result.geojsonInfringedPoints);
 		},
-		error: function(jqXHR, textStatus, errorThrown ) {
+		error: function (jqXHR, textStatus, errorThrown) {
 			toastr["error"](jqXHR.responseText, "Getting airspace for file failed !");
 			console.log(jqXHR);
 		},
-		complete: function( ataOrjqXHR, textStatus,jqXHROrerrorThrown ) {
+		complete: function (ataOrjqXHR, textStatus, jqXHROrerrorThrown) {
 			$('#airspace-spinner').addClass('d-none');	// Hide spinner
 		}
 	});
@@ -67,18 +67,18 @@ function getAirspaceForNetcoupeFlight(netcoupeFlightId) {
 		type: 'GET',
 		accept: "application/json",
 		headers: {
-			'x-api-key':xApiKey
+			'x-api-key': xApiKey
 		},
-		success: function(result) {
-			showInfringedAirspace(result.geojsonInfringedAirspace);
-			showInfringedAirspaceMarkers(result.geojsonInfringedPoints);
+		success: function (result) {
+			showInfringedAirspace(result);
+			showInfringedAirspaceMarkers(result);
 
 		},
-		error: function(jqXHR, textStatus, errorThrown ) {
+		error: function (jqXHR, textStatus, errorThrown) {
 			toastr["error"](jqXHR.responseText, "Getting airspace for Netcoupe flight failed. Id=" + netcoupeFlightId);
 			console.log(jqXHR);
 		},
-		complete: function( ataOrjqXHR, textStatus,jqXHROrerrorThrown ) {
+		complete: function (ataOrjqXHR, textStatus, jqXHROrerrorThrown) {
 			$('#airspace-spinner').addClass('d-none');	// Hide spinner
 		}
 	});
@@ -92,9 +92,9 @@ function getAirspaceForNetcoupeFlight(netcoupeFlightId) {
 function showInfringedAirspace(infringedAirspaceGeojson) {
 	// Add map source
 	map.addSource('infringed-airspace',
-        {
-            type: 'geojson',
-            data: infringedAirspaceGeojson
+		{
+			type: 'geojson',
+			data: infringedAirspaceGeojson
 		});
 	// --- Add layers ---
 	// Infringed airspace
@@ -105,7 +105,7 @@ function showInfringedAirspace(infringedAirspaceGeojson) {
 	Object.assign(infringedAirspaceLabelLayerDefinition, AIRSPACE_LABEL_LAYER_DEFINITION);
 	infringedAirspaceLabelLayerDefinition.id = "layer-infringed-airspace-label";
 	infringedAirspaceLabelLayerDefinition.source = "infringed-airspace";
-    map.addLayer(infringedAirspaceLabelLayerDefinition);
+	map.addLayer(infringedAirspaceLabelLayerDefinition);
 };
 
 function enableExtraFeatures() {
