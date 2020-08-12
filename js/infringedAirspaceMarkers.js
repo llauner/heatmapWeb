@@ -41,7 +41,12 @@ function setupMarkerPopup() {
 		var floorFt = 0;
 		if (floor.includes("FT")) {
 			floor = floor.replace(/\D/g, '');
+
 			floorFt = parseInt(floor);
+		}
+		if (floor.includes("FL")) {
+			floor = floor.replace(/\D/g, '');
+			floorFt = parseInt(floor) * 100;
 		}
 
 		var ceilingInM = parseInt(ceilingFt * 0.3048);
