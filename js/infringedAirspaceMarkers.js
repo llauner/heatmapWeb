@@ -30,7 +30,22 @@ function setupMarkerPopup() {
 		var properties = e.features[0].properties;
 
 		// Build description
-		var altitudeInFeet = parseInt(properties.alt * 3.2808);
+		var ceiling = properties.CEILING;
+		var ceilingFt = 0;
+		if (ceiling.includes("FL")) {
+			ceiling = ceiling.replace("FL", "");
+			ceilingFt = parseInt(ceiling) * 100;
+		}
+
+		var floor = properties.FLOOR;
+		var floorFt = 0;
+		if (floor.includes("FT")) {
+			floor = floor.replace(/\D/g, '');
+			floorFt = parseInt(floor);
+		}
+
+		var ceilingInM = parseInt(ceilingFt * 0.3048);
+		var floorInM = parseInt(floorFt * 0.3048);
 		var description = `
 		<table>
 			<tbody>
@@ -45,6 +60,10 @@ function setupMarkerPopup() {
 				<tr>
 					<td><strong>Ceiling / Floor</strong></td>
 					<td>${properties.CEILING} / ${properties.FLOOR}</td>
+				</tr>
+				<tr>
+					<td><strong>Ceiling / Floor</strong></td>
+					<td>${ceilingInM} m / ${floorInM} m </td>
 				</tr>
 			</tbody>
 			</table>
