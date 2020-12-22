@@ -3,9 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29306.81
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HeatmapWeb", ".\HeatmapWeb.csproj", "{0356D452-3B2D-4A1E-822C-E9C6C914D490}"
-EndProject
-Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "github_igc_lib", "..\github_igc_lib\github_igc_lib.pyproj", "{C7D8A499-CB80-42F1-807A-A8FA5C50E7E2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HeatmapWeb", "HeatmapWeb.csproj", "{0356D452-3B2D-4A1E-822C-E9C6C914D490}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,8 +15,6 @@ Global
 		{0356D452-3B2D-4A1E-822C-E9C6C914D490}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0356D452-3B2D-4A1E-822C-E9C6C914D490}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0356D452-3B2D-4A1E-822C-E9C6C914D490}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C7D8A499-CB80-42F1-807A-A8FA5C50E7E2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C7D8A499-CB80-42F1-807A-A8FA5C50E7E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
