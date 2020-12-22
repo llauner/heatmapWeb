@@ -7,16 +7,7 @@
             console.log("Loading Netcoupe flight#" + flightId);
             loadFlight(flightId);
         });
-    // --- Day + 1
-    $('#btn-day-forward').on('click',
-        function () {
-            reloadPage(1);
-        });
-    // --- Day + -1
-    $('#btn-day-backward').on('click',
-        function () {
-            reloadPage(-1);
-        });
+
     // --- Show / hide airspace ---
     $('#switch-airspace').on('change',
     function () {

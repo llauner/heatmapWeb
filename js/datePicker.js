@@ -3,7 +3,9 @@
 const AvailableDayFormat = "YYYY_MM_DD";
 const datePickerFormat = "DD-MM-YYYY";
 
-var _availableTracks = null;            // List of available days
+var _availableDays = null;                                      // List of available days
+var _selectedDayFilenames = null;
+
 
 
 /**
@@ -24,8 +26,8 @@ function discoverAvailableDays() {
                 toastr["error"]("No Heatmap days available !");
             }
             else {
+                selectDay();		// Get latest track by default
                 setupDatePicker();
-                selectLatestDay();		// Get latest track by default
             }
         },
         error: function (result, status, errorThrown) {
@@ -36,6 +38,23 @@ function discoverAvailableDays() {
         }
     });
 
+}
+
+/**
+ * selectTrack
+ * @param {any} pickerDate
+ */
+function selectDay(pickerDate) {
+    var targetAvailableDay = null;
+    if (!pickerDate) {
+        targetAvailableDay = _availableDays[_availableDays.length - 1];
+    }
+    else {
+        targetAvailableDay = pickerToTrack(pickerDate);
+    }
+
+    targetDate = targetAvailableDay;
+    _selectedDayFilenames = getFilenamesForTargetDate(targetDate);
 }
 
 function setupDatePicker() {
@@ -67,39 +86,17 @@ function setupDatePicker() {
         endDate: endDate,
     });
 
-    $('#datepicker').datepicker('setDate', endDate);
+    $('#datepicker').datepicker('setDate', trackToPicker(targetDate));                    // Set date to targetDate
     $('#datepicker').datepicker('setDatesDisabled', missingDays);
 
     // --- Events 
     datePicker.on('changeDate', function (e) {
-        var newTrackDate = moment(e.date).format(datePickerFormat);
-        console.debug(`New track day selected:${newTrackDate}`);
+        var newTrackDate = moment(e.date);
+        console.debug(`New track day selected:${newTrackDate.format(datePickerFormat)}`);
 
-        selectTrack(newTrackDate);
+        switchDayToTargetDate(newTrackDate);
     });
 }
-
-
-/**
- * selectTrack
- * @param {any} pickerDate
- */
-function selectLatestDay(pickerDate) {
-    var targetAvailableDay = null;
-    if (!pickerDate) {
-        targetAvailableDay = _availableDays[_availableDays.length - 1];
-    }
-    else {
-        targetAvailableDay = pickerToTrack(pickerDate);
-    }
-
-    _selectedDayFilenames = getFilenamesForTargetDate(targetAvailableDay);
-
-    //showHideVectorTracks(false);
-    //setupVectorTracks();
-    //setupTracksMetadata();
-}
-
 
 
 
@@ -109,4 +106,8 @@ function trackToPicker(availableTrackDay) {
 
 function pickerToTrack(pickerDay) {
     return startDate = moment(pickerDay, datePickerFormat).format(AvailableDayFormat);
+}
+
+function targetDateToString(targetDate) {
+    return moment(targetDate).format(TargetDateFormat);
 }

@@ -1,4 +1,6 @@
-﻿toastr.options = {
+﻿var trackIds = [];              // List of Netcoupe volId currently being displayed
+
+toastr.options = {
     "closeButton": false,
     "debug": false,
     "newestOnTop": false,

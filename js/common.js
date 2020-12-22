@@ -29,8 +29,8 @@ class DayFilenames {
  */
 function getFilenamesForTargetDate(target_date) {
 	f = new DayFilenames(
-		`${target_date}-heatmap.geojson`,
-		`${target_date}-metadata.json`)
+		`${storageBaseUrl}${target_date}-heatmap.geojson`,
+		`${storageBaseUrl}${target_date}-metadata.json`)
 
 	return f;
 }

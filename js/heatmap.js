@@ -63,28 +63,35 @@ function initHeatMap() {
         container: 'map',           // container id
         style: "styles/style.json"
     });
+    mapOnLoad();
 
+    
+}
+
+function mapOnLoad() {
     map.on('load',
         function () {
-
-            // Sycnhronously load Geojson data for the heatmap
-            $.ajax({
-                url: geojsonTargetDataSourceUrl,
-                type: 'GET',
-                context: document.body,
-                dataType: "json",
-                success: function (result) {
-                    if (typeof(result) !== 'object') {
-                        result = JSON.parse(result);
-                    }
-                    onHeatmapDataLoaded(result);
-                },
-                error: function (result, status, errorThrown) {
-                    console.log(errorThrown);
-                    //toastr["error"]("Could not load Heatmap: " + geojsonTargetDataSourceUrl);
-                }
-            });
+            loadHeatmapData();
         });
+}
+
+function loadHeatmapData() {
+    // Sycnhronously load Geojson data for the heatmap
+    $.ajax({
+        url: _selectedDayFilenames.GeojsonFileName,
+        type: 'GET',
+        context: document.body,
+        dataType: "json",
+        success: function (result) {
+            if (typeof (result) !== 'object') {
+                result = JSON.parse(result);
+            }
+            onHeatmapDataLoaded(result);
+        },
+        error: function (result, status, errorThrown) {
+            console.log(errorThrown);
+        }
+    });
 }
 
 function onHeatmapDataLoaded(result) {
@@ -98,7 +105,26 @@ function onHeatmapDataLoaded(result) {
         // Disable heatmap filter on time
         $('#feature-heatmap-time-filter').addClass('d-none');
     }
-}
+};
+
+function switchDayToTargetDate(newTargetDate) {
+    targetDate = newTargetDate
+    _selectedDayFilenames = getFilenamesForTargetDate(pickerToTrack(targetDate));
+
+    // Remove old day
+    if (map.getLayer("layer-heatmap"))
+        map.removeLayer("layer-heatmap");
+
+    if (map.getLayer("layer-vario-value"))
+        map.removeLayer("layer-vario-value");
+
+    if (map.getSource('latest-data'))
+        map.removeSource('latest-data');
+
+    // Load new data
+    loadHeatmapData();
+    loadMetadata();
+};
 
 function configureHeatmap() {
     // --- Add data source ---
@@ -106,7 +132,6 @@ function configureHeatmap() {
         type: 'geojson',
         data: heatmapGeojsonData
     });
-
 
     // --- Layer: Heatmap
     map.addLayer(

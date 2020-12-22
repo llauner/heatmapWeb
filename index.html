@@ -319,8 +319,6 @@
         var xApiKey = null;
         var isShowInfringedAirspaceOnly = false;
 
-        var trackIds = [];              // List of Netcoupe volId currently
-
         var map;
         var timelineVisGraph2d;         // The vis graph2d hosting the timeline
         var timelineData;               // The timeline graph data derived from the timelineGeojsonTrack
@@ -329,8 +327,6 @@
 
         var gliderIconPoint;
         var lastGraphTimeChangeEvent;
-
-        var availableMetadataDates = [];    // List of yyyy_mm_dd strings containing available yyyy_mm_dd-metadata.json files
 
         var $labelTrackTime;
         var $labelTrackAltitude;
@@ -356,16 +352,11 @@
             }
         }
 
-        // Build geojson and metadata  filename
-        var geojsonTargetDataSourceUrl = storageBaseUrl + "latest" + heatMapFileNamePrefix;
-        var metadataJsonSourceUrl = storageBaseUrl + "latest" + metaDataFileNamePrefix;
-
         // --- Apply queystring parameters ---
         // Target day
         if (targetDayParam) {
             targetDate = moment(targetDayParam, "YYYY_MM_DD");
-            geojsonTargetDataSourceUrl = storageBaseUrl + targetDayParam + heatMapFileNamePrefix;
-            metadataJsonSourceUrl = storageBaseUrl + targetDayParam + metaDataFileNamePrefix;
+            getFilenamesForTargetDate(targetDate);
         }
 
         Dropzone.autoDiscover = false;
@@ -373,7 +364,6 @@
         // ---------- Launch initialisation ----------
         setupAirspace();        // Setup the airspace
         discoverAvailableDays();
-        getFileList();          // Get list of available geojson files
 
         // ---------- Document loaded ----------
         $(function () {
@@ -382,12 +372,26 @@
             $labelTrackAltitude = $("#current-track-altitude");
 
             // ----- Setup heatmap -----
-            initHeatMap();
+
+            (async () => {
+                console.log("Waiting for available days to be retrieved ...");
+                while (!_selectedDayFilenames) // define the condition as you like
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                launchInitMap();                                                // Days and filenames available. Continue init ...
+            })();
+
+
+            /**
+             * launchInitMap
+             * Will continue Init after available dates have been retrieved
+             */
+            function launchInitMap() {
+                initHeatMap();
+                loadMetadata();
+            }
+            
 
             setupDropZone();        // Setup the dropzone upload
-
-            loadMetadata();
-            
 
             // --- Filter Heatmap on time ---
             $('#chk-time-filter').on('change',

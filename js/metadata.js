@@ -1,7 +1,7 @@
 ﻿function loadMetadata() {
     // ----- Load MetaData -----
     $.ajax({
-        url: metadataJsonSourceUrl,
+        url: _selectedDayFilenames.MetaDataFileName,
         type: 'GET',
         context: document.body,
         success: function (result) {
