@@ -56,7 +56,6 @@
     <Content Include="js\airspace.js" />
     <Content Include="js\common.js" />
     <Content Include="js\datePicker.js" />
-    <Content Include="js\dayNavigation.js" />
     <Content Include="js\heatmap.js" />
     <Content Include="js\application.js" />
     <Content Include="js\infringedAirspaceMarkers.js" />
