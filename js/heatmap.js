@@ -59,13 +59,12 @@ function filterBy(vario, altitude, projectedTimestamp) {
 
 
 function initHeatMap() {
+    showMapSpinner(true, "Init Heatmap ...");
     map = new mapboxgl.Map({
         container: 'map',           // container id
         style: "styles/style.json"
     });
     mapOnLoad();
-
-    
 }
 
 function mapOnLoad() {
@@ -76,6 +75,8 @@ function mapOnLoad() {
 }
 
 function loadHeatmapData() {
+
+    showMapSpinner(true, "Loading data ...");
     // Sycnhronously load Geojson data for the heatmap
     $.ajax({
         url: _selectedDayFilenames.GeojsonFileName,
@@ -90,6 +91,9 @@ function loadHeatmapData() {
         },
         error: function (result, status, errorThrown) {
             console.log(errorThrown);
+        },
+        complete: function (jqXHR, textStatus) {
+            showMapSpinner(false);
         }
     });
 }

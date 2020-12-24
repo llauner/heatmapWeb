@@ -113,3 +113,13 @@ function initToolTip_Airspace(metadata) {
         title: text
     })
 }
+
+function showMapSpinner(show, message) {
+    $('#map-spinner-text').html((message)? message : "Loading ...");
+
+    if (show)
+        $('#map-spinner').removeClass('d-none');	// Show spinner
+
+    else
+        $('#map-spinner').addClass('d-none');	// Hide spinner
+}

@@ -69,6 +69,7 @@
 </head>
 <body>
     <div id="map"></div>
+    <div id="s1"></div>
     <!---------- Information overlay ---------->
     <div class="map-overlay top">
         <div class="map-overlay-inner">
@@ -78,17 +79,6 @@
                         <div class="col-sm-2">
                             <div class="item">Date</div>
                         </div>
-
-                        <!--<div class="col-sm-2">
-                            <button type="button" class="btn fa fa-backward disabled-button" id="btn-day-backward" />
-                        </div>
-                        <div class="col-sm-5">
-                            <div id="target-date" class="item thick"></div>
-                        </div>
-                        <div class="col-sm-2">
-                            <button type="button" class="btn fa fa-forward disabled-button" id="btn-day-forward" />
-                        </div>-->
-
                         <div class="col-sm-9">
                             <!--- Date Selector-->
                             <div id="date-picker-div">
@@ -98,11 +88,9 @@
                                 </div>
                             </div>
                         </div>
-
-
-                        </div>
-                        <img id="up-down-arrow" src="images/left.png" alt="Reduce box" class="down-arrow" />
                     </div>
+                    <img id="up-down-arrow" src="images/left.png" alt="Reduce box" class="down-arrow" />
+                </div>
 
                 <div id="reducible" class="d-none">
                     <div class="row">
@@ -220,7 +208,7 @@
                     <h6 class="font-weight-bold">Layers</h6>
                     <img src="images/left.png" alt="Boxing down" class="left-arrow" />
                 </div>
-                
+
                 <!-- Airspace toggle button -->
                 <div class="row" id="switch-airspace-container">
                     <div class="col-sm-12">
@@ -241,14 +229,14 @@
                     <h6 class="font-weight-bold">Extra Features</h6>
                     <img src="images/left.png" alt="Boxing down" class="left-arrow" />
                 </div>
-                
+
                 <!-- Airspace infringement toggle button -->
                 <div class="row" id="xtra-features-container">
                     <div class="col-sm-2">
                         <input class="form-check-input" type="checkbox" value="" id="chk-show-infringed-only">
                     </div>
                     <div class="col-sm-10">
-                            <label class="form-check-label" for="defaultCheck1">Show infringed Airspace only</label>
+                        <label class="form-check-label" for="defaultCheck1">Show infringed Airspace only</label>
                     </div>
                 </div>
             </div>
@@ -256,9 +244,9 @@
 
     </div>
 
-    <!-- -------- Flight timeline --------- -->    
+    <!-- -------- Flight timeline --------- -->
     <div class="map-overlay map-overlay-timeline fixed-bottom bottom d-none" id="flight-timeline">
-    <button class="circle-button d-none" id="timeline-button"><img src="images/graph.png" alt="Timeline" /></button>
+        <button class="circle-button d-none" id="timeline-button"><img src="images/graph.png" alt="Timeline" /></button>
         <div class="map-overlay-inner">
             <div class="container">
                 <div class="row harmonize-line">
@@ -301,8 +289,16 @@
             <span class="">Loading Airspace ...</span>
         </button>
     </div>
+
+    <div class="container spinner-container d-none" id="map-spinner">
+        <button class="btn btn-secondary" type="button" disabled>
+            <span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
+            <span id="map-spinner-text">Loading...</span>
+        </button>
+    </div>
+
     <script>
-        
+
 
         var heatmapGeojsonData;
 
@@ -353,7 +349,7 @@
         // --- Apply queystring parameters ---
         // Target day
         if (targetDayParam) {
-            targetDate = moment(targetDayParam, "YYYY_MM_DD");
+            targetDate = targetDayParam;
             getFilenamesForTargetDate(targetDate);
         }
 
@@ -370,11 +366,11 @@
             $labelTrackAltitude = $("#current-track-altitude");
 
             // ----- Setup heatmap -----
-
+            // Wait for available days discovery to have terminated
             (async () => {
                 console.log("Waiting for available days to be retrieved ...");
                 while (!_selectedDayFilenames) // define the condition as you like
-                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    await new Promise(resolve => setTimeout(resolve, 250));
                 launchInitMap();                                                // Days and filenames available. Continue init ...
             })();
 
@@ -387,7 +383,7 @@
                 initHeatMap();
                 loadMetadata();
             }
-            
+
 
             setupDropZone();        // Setup the dropzone upload
 

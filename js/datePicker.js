@@ -14,7 +14,7 @@ var _selectedDayFilenames = null;
  */
 function discoverAvailableDays() {
     var availableDaysUrl = IgcRestApiEndpoint + IgcRestApiProcessedHeatmapDaysUrl;
-
+    showMapSpinner(true, "Discover processed days ...");
     $.ajax({
         url: availableDaysUrl,
         type: 'GET',
@@ -35,6 +35,7 @@ function discoverAvailableDays() {
             toastr["error"]("Could not load Heatmap: " + availableDaysUrl);
         },
         complete: function (jqXHR, textStatus) {
+            showMapSpinner(false);
         }
     });
 
@@ -53,7 +54,7 @@ function selectDay(pickerDate) {
         targetAvailableDay = pickerToTrack(pickerDate);
     }
 
-    targetDate = targetAvailableDay;
+    targetDate = (targetDate)? targetDate : targetAvailableDay;             // targetDate may have been provided as querystring param
     _selectedDayFilenames = getFilenamesForTargetDate(targetDate);
 }
 
