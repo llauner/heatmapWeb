@@ -12,7 +12,8 @@ const OpenAirMetadataFileName = "netcoupe-france-metadata.json";
 
 // --- IgcRest API
 const IgcRestApiEndpoint = "https://igcrestapi-dot-igcheatmap.appspot.com";
-const IgcRestApiProcessedHeatmapDaysUrl = "/heatmap/days";
+const IgcRestApi_apiKey = "?apiKey=4fdec54c-aa7e-43f9-986c-407fe52302a6"
+const IgcRestApiProcessedHeatmapDaysUrl = "/heatmap/days" + IgcRestApi_apiKey;
 
 
 class DayFilenames {
