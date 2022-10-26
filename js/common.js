@@ -1,7 +1,7 @@
 const HeatmapRestAPIEndpoint = "https://igcheatmap.appspot.com";
+const NetcoupeGeojsonAirspaceUrl = "https://planeur-net.github.io/airspace/france.geojson";
 const storageBaseUrl = "geojson/";
 const heatMapFileNamePrefix = "-heatmap.geojson";
-const metaDataFileNamePrefix = "-metadata.json";
 
 const TargetDateFormat = "YYYY_MM_DD"
 

@@ -71,6 +71,12 @@
     <Content Include="js\vis\vis.js.map" />
     <Content Include="js\vis\vis.min.js.map" />
     <Content Include="styles\style.json" />
+    <Content Include="geojson\2022_10_26-heatmap.geojson">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="geojson\2022_10_26-metadata.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

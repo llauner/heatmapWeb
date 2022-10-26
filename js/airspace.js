@@ -8,7 +8,7 @@ var AIRSPACE_LAYER_DEFINITION =  {
     "paint": {
         "line-color": [
             "match",
-            ["get", "CLASS"],
+            ["get", "class"],
             ["A"],
             "hsl(0, 72%, 44%)",
             ["C"],
@@ -54,13 +54,13 @@ var AIRSPACE_LABEL_LAYER_DEFINITION =   {
             "to-string",
             [
                 "concat",
-                ["get", "CLASS"],
+                ["get", "class"],
                 "\n",
-                ["get", "NAME"],
+                ["get", "name"],
                 "\n",
-                ["get", "CEILING"],
+                ["get", "upperCeiling"],
                 " / ",
-                ["get", "FLOOR"]
+                ["get", "lowerCeiling"]
             ]
         ],
         "text-size": 10,
@@ -87,7 +87,7 @@ function setupAirspace() {
     var metadataUrl = NetcoupeAirspaceDataUrl + OpenAirMetadataFileName;
 
     $.ajax({
-        url: airspaceUrl,
+        url: NetcoupeGeojsonAirspaceUrl,
         type: 'GET',
         context: document.body,
         dataType: "json",
@@ -96,23 +96,6 @@ function setupAirspace() {
                 result = JSON.parse(result);
             }
             configureAirspace(result);    
-        },
-        error: function(result, status, errorThrown) {
-            console.log(errorThrown);
-            toastr["error"]("Could not load Airspace: " + airspaceUrl);
-        }
-    });
-
-    $.ajax({
-        url: metadataUrl,
-        type: 'GET',
-        context: document.body,
-        dataType: "json",
-        success: function(result) {
-            if (typeof (result) !== 'object') {
-                result = JSON.parse(result);
-            }
-            initToolTip_Airspace(result);    
         },
         error: function(result, status, errorThrown) {
             console.log(errorThrown);
